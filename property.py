@@ -1,6 +1,6 @@
-class Board():
+class Property():
     """
-    The base board class for monopoly
+    Class representing properties in Monopoly
     """
     def __init__():
         pass

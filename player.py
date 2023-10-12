@@ -1,6 +1,6 @@
-class Board():
+class Player():
     """
-    The base board class for monopoly
+    class representing individual player in monopoly
     """
     def __init__():
         pass

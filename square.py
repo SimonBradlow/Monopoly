@@ -1,6 +1,6 @@
-class Board():
+class Square():
     """
-    The base board class for monopoly
+    The class representing an individual square on the board
     """
     def __init__():
         pass
