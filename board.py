@@ -1,5 +1,6 @@
 import arcade
 from square import Square
+from property import Property
 
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
@@ -54,6 +55,13 @@ class Board(arcade.Window):
         right_tile_tilt = 90
         top_tile_tilt = 180
         left_tile_tilt = 270
+        left_corners_x = 125
+        bottom_corners_y = 125
+        right_corners_x = 475
+        top_corners_y = 475
+        corner_tile_width = 50
+        corner_tile_height = 50
+
 
         #draw logo
         arcade.draw_scaled_texture_rectangle(self.width/2, self.height/2, logo, logo_scale, logo_tilt_angle)
@@ -66,10 +74,14 @@ class Board(arcade.Window):
         arcade.draw_rectangle_outline(board_center_x, board_center_y, outer_board_width,
                                       outer_board_height, board_color, border_width)
 
+        property = Property("test", 0, [], 0, 0)
+
+
         #call square for each tile in bottom row
         for i in range(0, num_tiles):
 
-            Square.draw(row_tile_x, bottom_tile_y, tile_width, tile_height, bottom_tile_tilt)
+            square = Square("test", property, row_tile_x, bottom_tile_y, tile_width, tile_height)
+            square.draw(row_tile_x, bottom_tile_y, bottom_tile_tilt)
 
             row_tile_x += tile_width
 
@@ -78,15 +90,15 @@ class Board(arcade.Window):
 
         #call square for each tile in top row
         for i in range(0, num_tiles):
-
-            Square.draw(row_tile_x, top_tile_y, tile_width, tile_height, top_tile_tilt)
+            square = Square("test", property, row_tile_x, top_tile_y, tile_width, tile_height, top_tile_tilt)
+            square.draw(row_tile_x, top_tile_y, tile_width, tile_height, top_tile_tilt)
 
             row_tile_x += tile_width
 
         #call square for each tile in right column
         for i in range(0, num_tiles):
-
-            Square.draw(right_tile_x, column_tile_y, tile_width, tile_height, right_tile_tilt)
+            square = Square("test", property, right_tile_x, column_tile_y, tile_width, tile_height, right_tile_tilt)
+            square.draw(right_tile_x, column_tile_y, right_tile_tilt)
 
             column_tile_y += tile_width
 
@@ -95,10 +107,20 @@ class Board(arcade.Window):
 
         #call square for each tile in left column
         for i in range(0, num_tiles):
-            Square.draw(left_tile_x, column_tile_y, tile_width, tile_height, left_tile_tilt)
+            square = Square("test", property, left_tile_x, column_tile_y, tile_width, tile_height)
+            square.draw(left_tile_x, column_tile_y, tile_width, tile_height, left_tile_tilt)
 
             column_tile_y += tile_width
 
+        #call corner tile special cases
+        square = Square("test", property, left_corners_x, bottom_corners_y, corner_tile_width, corner_tile_height)
+        square.draw(left_corners_x, bottom_corners_y, corner_tile_width, corner_tile_height, bottom_tile_tilt)
+        square = Square("test", property, left_corners_x, top_corners_y, corner_tile_width, corner_tile_height)
+        square.draw(left_corners_x, top_corners_y, corner_tile_width, corner_tile_height, bottom_tile_tilt)
+        square = Square("test", property, right_corners_x, bottom_corners_y, corner_tile_width, corner_tile_height)
+        square.draw(right_corners_x, bottom_corners_y, corner_tile_width, corner_tile_height, bottom_tile_tilt)
+        square = Square("test", property, right_corners_x, top_corners_y, corner_tile_width, corner_tile_height)
+        square.draw(right_corners_x, top_corners_y, corner_tile_width, corner_tile_height, bottom_tile_tilt)
 
     def on_update(self, delta_time):
         """
