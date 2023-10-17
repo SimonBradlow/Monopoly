@@ -25,6 +25,13 @@ class Square():
         inner_outline = arcade.create_rectangle_outline(0, (height/8)*3, width, height/4, arcade.color.BLACK, 1)
 
         # add Sprites
+        self.house_sprites = []
+        if property is not None:
+            house_scaling = width/400 
+            for i in range(5):
+                png_name = "assets/house" + str(i+1) + ".png"
+                self.house_sprites.append(arcade.Sprite(png_name, house_scaling))
+
         # TODO: select specific sprite img based on property.name
         # TODO: remove unecessary shapes from tiles with sprites
         scaling = width/204
@@ -56,3 +63,14 @@ class Square():
                 s.center_y = y
                 s.angle = angle
             self.sprite_list.draw()
+
+        if self.property is not None:
+            if self.property.building_count > 0:
+                house = self.house_sprites[self.property.building_count-1]
+                house.center_x = x
+                house.center_y = y + (self.height/8)*3
+                house.angle = angle
+                house.position = arcade.rotate_point(
+                    house.center_x, house.center_y,
+                    x, y, angle)
+                house.draw()
