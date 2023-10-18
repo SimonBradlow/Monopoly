@@ -35,10 +35,14 @@ class Square():
         # TODO: select specific sprite img based on property.name
         # TODO: remove unecessary shapes from tiles with sprites
         scaling = width/204
-        tile_sprite = arcade.Sprite("assets/go.png", scaling)
-        tile_sprite.center_x = 0
-        tile_sprite.center_y = 0
-        self.sprite_list.append(tile_sprite)
+        sprite_names = ["go", "jail", "freeparking", "gotojail"]
+        fixed_name = self.name.lower().replace(" ", "")
+        if fixed_name in sprite_names:
+            png_name = "assets/" + fixed_name + ".png"
+            tile_sprite = arcade.Sprite(png_name, scaling)
+            tile_sprite.center_x = 0
+            tile_sprite.center_y = 0
+            self.sprite_list.append(tile_sprite)
 
         # Add objects to the shape_list
         self.shape_list.append(background)
@@ -64,6 +68,7 @@ class Square():
                 s.angle = angle
             self.sprite_list.draw()
 
+        # House sprites
         if self.property is not None:
             if self.property.building_count > 0:
                 house = self.house_sprites[self.property.building_count-1]
