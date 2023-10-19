@@ -30,18 +30,20 @@ class Board(arcade.Window):
         # Create your sprites and sprite lists here
         #initialize squares list
         self.squares = []
-        with open("board.csv") as board_file:
+        with open('board.csv', mode ='r') as board_file:
             boardreader = csv.DictReader(board_file)
             for line in boardreader:
                 width = 33.3333
                 height = 50
                 p = None
                 # Create the property from the CSV file (the None values are for mortgage and building cost, which aren't in the CSV yet)
+                corner_names = ['Go', 'Jail', 'Parking', 'GoToJail']
+                non_property_names = ['Railroad', 'Utility', 'Tax', 'Chance', 'Chest']
                 if line['Space'] == 'Street':
                     p = Property(line['Name'], line['Color'], int(line['Price']), [int(line['Rent'])] + [int(line[f'RentBuild{i}']) for i in range(1, 6)], None, None)
-                elif line['Space'] == 'Railroad' or line['Space'] == 'Utility':
+                elif line['Space'] in non_property_names:
                     p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None)
-                elif line['Space'] == 'Go' or line['Space'] == 'Jail' or line['Space'] == 'Parking' or line['Space'] == 'GoToJail':
+                elif line['Space'] in corner_names:
                     p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None)
                     width = 50
                 # Add the square to the list of squares, was unsure what to initialize x/y/height/width to
