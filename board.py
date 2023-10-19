@@ -217,6 +217,12 @@ class Board(arcade.Window):
             else:
                 return p.rents[0]
 
+    def roll():
+        roll1 = random.randint(1, 6)
+        roll2 = random.randint(1, 6)
+        rolls = (roll1, roll2)
+        return rolls
+
 
 def main():
     """ Main function """
