@@ -5,8 +5,11 @@ class Square():
     """
     The class representing an individual square on the board
     """
-    def __init__(self, name: str, property: Property, x: int, y: int, width: float, height: float):
+    def __init__(self, name: str, space: str, color: str, position:int, property: Property, x: int, y: int, width: float, height: float):
         self.name = name
+        self.space = space
+        self.color = color
+        self.position = position
         self.property = property
         self.x = x
         self.y = y
@@ -17,23 +20,23 @@ class Square():
         # Initialize shape_list
         self.shape_list = arcade.ShapeElementList()
         self.sprite_list = arcade.SpriteList()
+        self.house_sprites = []
 
         # Create shape objects
         background = arcade.create_rectangle_filled(0, 0, width, height, (204, 227, 199)) 
         border = arcade.create_rectangle_outline(0, 0, width, height, arcade.color.BLACK, 1) 
+        # TODO: translate color string into RGB and fill inner with it
         inner = arcade.create_rectangle_filled(0, (height/8)*3, width, height/4, arcade.color.BLUE)
         inner_outline = arcade.create_rectangle_outline(0, (height/8)*3, width, height/4, arcade.color.BLACK, 1)
 
-        # add Sprites
-        self.house_sprites = []
-        if property is not None:
-            house_scaling = width/400 
-            for i in range(5):
-                png_name = "assets/house" + str(i+1) + ".png"
-                self.house_sprites.append(arcade.Sprite(png_name, house_scaling))
+        # Add shape objects to the shape_list
+        self.shape_list.append(background)
+        self.shape_list.append(border)
+        if self.space == "Street":
+            self.shape_list.append(inner)
+            self.shape_list.append(inner_outline)
 
-        # TODO: select specific sprite img based on property.name
-        # TODO: remove unecessary shapes from tiles with sprites
+        # Initialize non-street sprites
         scaling = width/204
         sprite_names = ["go", "jail", "freeparking", "gotojail"]
         fixed_name = self.name.lower().replace(" ", "")
@@ -44,11 +47,12 @@ class Square():
             tile_sprite.center_y = 0
             self.sprite_list.append(tile_sprite)
 
-        # Add objects to the shape_list
-        self.shape_list.append(background)
-        self.shape_list.append(border)
-        self.shape_list.append(inner)
-        self.shape_list.append(inner_outline)
+        # Initialize house sprites
+        if property is not None:
+            house_scaling = width/400 
+            for i in range(5):
+                png_name = "assets/house" + str(i+1) + ".png"
+                self.house_sprites.append(arcade.Sprite(png_name, house_scaling))
 
     def draw(self, x, y, angle):
         # Set position and rotation of tile
