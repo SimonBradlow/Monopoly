@@ -240,6 +240,12 @@ class Board(arcade.Window):
         """
         player.money += 200 * ((player.position + squares) // len(self.squares))
         player.position = (player.position + squares) % len(self.squares)
+    
+    def roll():
+        roll1 = random.randint(1, 6)
+        roll2 = random.randint(1, 6)
+        rolls = (roll1, roll2)
+        return rolls
 
 
 def main():
