@@ -217,6 +217,22 @@ class Board(arcade.Window):
             else:
                 return p.rents[0]
 
+    def buy_property(self, property: Property, player: Player, price = None):
+        """
+        Handle the buying of property, at base or any other price
+        If purchase goes through, returns True
+        If player cannot afford the property, returns False
+        """
+        if price is None:
+            price = property.price
+        if player.money < price:
+            return False
+        if self.owners[property] is not None:
+            self.owners[property].money += price
+        player.money -= price
+        self.owners[property] = player
+        return True
+
 
 def main():
     """ Main function """
