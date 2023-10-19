@@ -219,7 +219,7 @@ class Board(arcade.Window):
 
     def buy_property(self, property: Property, player: Player, price = None):
         """
-        Handle the buying of property, at base or any other price
+        Handle the buying and selling of property, at base or any other price
         If purchase goes through, returns True
         If player cannot afford the property, returns False
         """
@@ -232,6 +232,14 @@ class Board(arcade.Window):
         player.money -= price
         self.owners[property] = player
         return True
+
+    def move_player(self, player: Player, squares: int):
+        """
+        Move a player a given number of squares
+        Check if they pass go, if so they gain 200 money
+        """
+        player.money += 200 * ((player.position + squares) // len(self.squares))
+        player.position = (player.position + squares) % len(self.squares)
 
 
 def main():
