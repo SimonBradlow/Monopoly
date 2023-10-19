@@ -1,6 +1,8 @@
 import arcade
 from square import Square
 from property import Property
+from player import Player
+from collections import defaultdict
 import csv
 
 SCREEN_WIDTH = 600
@@ -30,6 +32,12 @@ class Board(arcade.Window):
         # Create your sprites and sprite lists here
         #initialize squares list
         self.squares = []
+        # List of all properties kept for accessibility
+        self.properties = []
+        # Initialize dictionary to track property ownership
+        self.owners = {}
+        # Initialize a defaultdict(int) to count property types
+        self.group_counts = defaultdict(int)
         with open("board.csv") as board_file:
             boardreader = csv.DictReader(board_file)
             for line in boardreader:
@@ -39,8 +47,16 @@ class Board(arcade.Window):
                     p = Property(line['Name'], line['Color'], int(line['Price']), [int(line['Rent'])] + [int(line[f'RentBuild{i}']) for i in range(1, 6)], None, None)
                 elif line['Space'] == 'Railroad' or line['Space'] == 'Utility':
                     p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None)
+                if p is not None:
+                    # Add the property to the list of properties
+                    self.properties.append(p)
+                    self.owners[p] = None
+                    self.group_counts[p.group] += 1
                 # Add the square to the list of squares, was unsure what to initialize x/y/height/width to
                 self.squares.append(Square(line['Name'], p, 0, 0, 0, 0))
+        
+        self.players = []
+        self.turn = 0
 
     def on_draw(self):
         self.clear()
@@ -175,6 +191,31 @@ class Board(arcade.Window):
         Called when a user releases a mouse button.
         """
         pass
+    
+    """Game Logic Functions"""
+    def calculate_rent(self, p: Property, dice_total = None):
+        """Calculate the rent owed for a certain property, if unowned or mortgaged rent is 0"""
+        owner = self.owners[p]
+        if owner is None or p.mortgaged:
+            return 0
+        # If the property is a utility, rent depends on the dice rolled this turn
+        if p.group == "Utility":
+            if owner.get_group_counts(p.group) == 2:
+                return p.rents[1] * dice_total
+            else:
+                return p.rents[0] * dice_total
+        # If the property is a railroad, rent just depends on how many railroads the owner owns
+        elif p.group == "Railroad":
+            return p.rents[0] * owner.get_group_counts(p.group)
+        # Otherwise, rent depends on whether the player has a monopoly and the buildings on the property
+        else:
+            monopoly = owner.get_group_counts(p.group) == self.group_counts(p.group)
+            if monopoly and p.building_count == 0:
+                return p.rents[0] * 2
+            elif monopoly:
+                return p.rents[p.building_count]
+            else:
+                return p.rents[0]
 
 
 def main():
