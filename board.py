@@ -33,14 +33,19 @@ class Board(arcade.Window):
         with open("board.csv") as board_file:
             boardreader = csv.DictReader(board_file)
             for line in boardreader:
+                width = 33.3333
+                height = 50
                 p = None
                 # Create the property from the CSV file (the None values are for mortgage and building cost, which aren't in the CSV yet)
                 if line['Space'] == 'Street':
                     p = Property(line['Name'], line['Color'], int(line['Price']), [int(line['Rent'])] + [int(line[f'RentBuild{i}']) for i in range(1, 6)], None, None)
                 elif line['Space'] == 'Railroad' or line['Space'] == 'Utility':
                     p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None)
+                elif line['Space'] == 'Go' or line['Space'] == 'Jail' or line['Space'] == 'Parking' or line['Space'] == 'GoToJail':
+                    p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None)
+                    width = 50
                 # Add the square to the list of squares, was unsure what to initialize x/y/height/width to
-                self.squares.append(Square(line['Name'], p, 0, 0, 0, 0))
+                self.squares.append(Square(int(line['Position']), p, width, height))
 
     def on_draw(self):
         self.clear()
@@ -72,8 +77,6 @@ class Board(arcade.Window):
         bottom_corners_y = 125
         right_corners_x = 475
         top_corners_y = 475
-        corner_tile_width = 50
-        corner_tile_height = 50
 
 
         #draw logo
@@ -95,53 +98,54 @@ class Board(arcade.Window):
         arcade.draw_rectangle_outline(375, 375, 40,
                                       80, board_color, border_width, logo_tilt_angle - 90)
 
-        property = Property("test", 0, [], 0, 0)
+        property = Property("test", "test", 0, [], 0, 0)
 
+        #draw go tile at position 0
+        self.squares[0].draw(left_corners_x, bottom_corners_y, bottom_tile_tilt)
+
+        # call square for each tile in left column
+        for i in range(1, num_tiles + 1):
+            self.squares[i].draw(left_tile_x, column_tile_y, left_tile_tilt)
+
+            column_tile_y += tile_width
+
+        #draw jail tile at position 10
+        self.squares[10].draw(left_corners_x, top_corners_y, bottom_tile_tilt)
+
+        # call square for each tile in top row
+        for i in range(11, num_tiles + 11):
+            self.squares[i].draw(row_tile_x, top_tile_y, top_tile_tilt)
+
+            row_tile_x += tile_width
+
+        #draw free parking tile at position 20
+        self.squares[20].draw(right_corners_x, top_corners_y, bottom_tile_tilt)
+
+        #reset column y
+        column_tile_y = 433
+
+        # call square for each tile in right column
+        for i in range(21, num_tiles + 21):
+            self.squares[i].draw(right_tile_x, column_tile_y, right_tile_tilt)
+
+            column_tile_y -= tile_width
+
+        #draw go to jail at position 30
+        self.squares[30].draw(right_corners_x, bottom_corners_y, bottom_tile_tilt)
+
+        #reset row x
+        row_tile_x = 433
 
         #call square for each tile in bottom row
-        for i in range(0, num_tiles):
+        for i in range(31, num_tiles + 31):
 
-            square = Square("test", property, row_tile_x, bottom_tile_y, tile_width, tile_height)
-            square.draw(row_tile_x, bottom_tile_y, bottom_tile_tilt)
+            self.squares[i].draw(row_tile_x, bottom_tile_y, bottom_tile_tilt)
 
-            row_tile_x += tile_width
+            row_tile_x -= tile_width
 
-        #reset x value for top row
-        row_tile_x = 166
 
-        #call square for each tile in top row
-        for i in range(0, num_tiles):
-            square = Square("test", property, row_tile_x, top_tile_y, tile_width, tile_height)
-            square.draw(row_tile_x, top_tile_y, top_tile_tilt)
 
-            row_tile_x += tile_width
 
-        #call square for each tile in right column
-        for i in range(0, num_tiles):
-            square = Square("test", property, right_tile_x, column_tile_y, tile_width, tile_height)
-            square.draw(right_tile_x, column_tile_y, right_tile_tilt)
-
-            column_tile_y += tile_width
-
-        #reset y value for left column
-        column_tile_y = 167
-
-        #call square for each tile in left column
-        for i in range(0, num_tiles):
-            square = Square("test", property, left_tile_x, column_tile_y, tile_width, tile_height)
-            square.draw(left_tile_x, column_tile_y, left_tile_tilt)
-
-            column_tile_y += tile_width
-
-        #call corner tile special cases
-        square = Square("test", property, left_corners_x, bottom_corners_y, corner_tile_width, corner_tile_height)
-        square.draw(left_corners_x, bottom_corners_y, bottom_tile_tilt)
-        square = Square("test", property, left_corners_x, top_corners_y, corner_tile_width, corner_tile_height)
-        square.draw(left_corners_x, top_corners_y, bottom_tile_tilt)
-        square = Square("test", property, right_corners_x, bottom_corners_y, corner_tile_width, corner_tile_height)
-        square.draw(right_corners_x, bottom_corners_y, bottom_tile_tilt)
-        square = Square("test", property, right_corners_x, top_corners_y, corner_tile_width, corner_tile_height)
-        square.draw(right_corners_x, top_corners_y, bottom_tile_tilt)
 
     def on_update(self, delta_time):
         """
