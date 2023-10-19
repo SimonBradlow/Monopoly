@@ -5,14 +5,9 @@ class Square():
     """
     The class representing an individual square on the board
     """
-    def __init__(self, name: str, space: str, color: str, position:int, property: Property, width: float, height: float):
-        self.name = name
-        self.space = space
-        self.color = color
+    def __init__(self, position: int, property: Property, width: float, height: float):
         self.position = position
         self.property = property
-        self.width = width
-        self.height = height
 
         # CODE BELOW IS NEEDED FOR Square.draw() METHOD
         # Initialize shape_list
