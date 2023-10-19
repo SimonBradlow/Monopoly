@@ -74,6 +74,14 @@ class Board(arcade.Window):
         arcade.draw_rectangle_outline(board_center_x, board_center_y, outer_board_width,
                                       outer_board_height, board_color, border_width)
 
+        #draw community chest
+        arcade.draw_rectangle_outline(225, 225, 40,
+                                      80, board_color, border_width, logo_tilt_angle - 90)
+
+        #draw chance
+        arcade.draw_rectangle_outline(375, 375, 40,
+                                      80, board_color, border_width, logo_tilt_angle - 90)
+
         property = Property("test", 0, [], 0, 0)
 
 
