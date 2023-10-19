@@ -36,9 +36,9 @@ class Board(arcade.Window):
                 p = None
                 # Create the property from the CSV file (the None values are for mortgage and building cost, which aren't in the CSV yet)
                 if line['Space'] == 'Street':
-                    p = Property(line['Name'], int(line['Price']), [int(line['Rent'])] + [int(line[f'RentBuild{i}']) for i in range(1, 6)], None, None)
+                    p = Property(line['Name'], line['Color'], int(line['Price']), [int(line['Rent'])] + [int(line[f'RentBuild{i}']) for i in range(1, 6)], None, None)
                 elif line['Space'] == 'Railroad' or line['Space'] == 'Utility':
-                    p = Property(line['Name'], int(line['Price']), [int(line['Rent'])], None, None)
+                    p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None)
                 # Add the square to the list of squares, was unsure what to initialize x/y/height/width to
                 self.squares.append(Square(line['Name'], p, 0, 0, 0, 0))
 
