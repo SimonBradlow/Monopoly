@@ -5,14 +5,12 @@ class Square():
     """
     The class representing an individual square on the board
     """
-    def __init__(self, name: str, space: str, color: str, position:int, property: Property, x: int, y: int, width: float, height: float):
+    def __init__(self, name: str, space: str, color: str, position:int, property: Property, width: float, height: float):
         self.name = name
         self.space = space
         self.color = color
         self.position = position
         self.property = property
-        self.x = x
-        self.y = y
         self.width = width
         self.height = height
 
