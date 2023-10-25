@@ -3,8 +3,9 @@ from square import Square
 from property import Property
 import csv
 
-SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 800
+EDGE_SPACE = 100
 SCREEN_TITLE = "Monopoly!"
 
 
@@ -33,8 +34,8 @@ class Board(arcade.Window):
         with open('board.csv', mode ='r') as board_file:
             boardreader = csv.DictReader(board_file)
             for line in boardreader:
-                width = 33.3333
-                height = 50
+                width = ((SCREEN_WIDTH-(EDGE_SPACE*2))*(3/4))/9
+                height = (SCREEN_HEIGHT-(EDGE_SPACE*2))/8
                 p = None
                 # Create the property from the CSV file (the None values are for mortgage and building cost, which aren't in the CSV yet)
                 corner_names = ['Go', 'Jail', 'Parking', 'GoToJail']
@@ -45,60 +46,70 @@ class Board(arcade.Window):
                     p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None)
                 elif line['Space'] in corner_names:
                     p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None)
-                    width = 50
+                    width = height
                 # Add the square to the list of squares, was unsure what to initialize x/y/height/width to
                 self.squares.append(Square(int(line['Position']), p, width, height))
 
     def on_draw(self):
         self.clear()
-        logo = arcade.load_texture("assets/logo.png")
-        logo_scale = .4
-        logo_tilt_angle = -45
         board_color = arcade.color.BLACK
-        board_center_x = 300
-        board_center_y = 300
-        inner_board_width = 300
-        inner_board_height = 300
-        outer_board_width = 400
-        outer_board_height = 400
+        board_center_x = SCREEN_WIDTH/2
+        board_center_y = SCREEN_HEIGHT/2
+        inner_board_width = (SCREEN_WIDTH-(EDGE_SPACE*2))*(3/4)
+        inner_board_height = (SCREEN_HEIGHT-(EDGE_SPACE*2))*(3/4)
+        outer_board_width = SCREEN_WIDTH-(EDGE_SPACE*2)
+        outer_board_height = SCREEN_HEIGHT-(EDGE_SPACE*2)
         border_width = 1
-        tile_width = 33.3333
-        tile_height = 50
-        num_tiles = round(inner_board_width / tile_width)
-        row_tile_x = 166
-        bottom_tile_y = 125
-        top_tile_y = 475
-        column_tile_y = 167
-        left_tile_x = 125
-        right_tile_x = 475
+        tile_width = inner_board_width/9
+        tile_height = outer_board_height/8
+        num_tiles = 9
+        row_tile_x = EDGE_SPACE+tile_height+(tile_width/2)
+        bottom_tile_y = EDGE_SPACE+tile_height/2
+        top_tile_y = SCREEN_HEIGHT-EDGE_SPACE-(tile_height/2)
+        column_tile_y = EDGE_SPACE+tile_height+(tile_width/2)
+        left_tile_x = EDGE_SPACE+tile_height/2
+        right_tile_x = SCREEN_WIDTH-EDGE_SPACE-(tile_height/2)
         bottom_tile_tilt = 0
         right_tile_tilt = 90
         top_tile_tilt = 180
         left_tile_tilt = 270
-        left_corners_x = 125
-        bottom_corners_y = 125
-        right_corners_x = 475
-        top_corners_y = 475
-
-
-        #draw logo
-        arcade.draw_scaled_texture_rectangle(self.width/2, self.height/2, logo, logo_scale, logo_tilt_angle)
+        left_corners_x = EDGE_SPACE+tile_height/2
+        bottom_corners_y = EDGE_SPACE+tile_height/2
+        right_corners_x = SCREEN_WIDTH-EDGE_SPACE-(tile_height/2)
+        top_corners_y = SCREEN_HEIGHT-EDGE_SPACE-(tile_height/2)
 
         #draw inner square of board
-        arcade.draw_rectangle_outline(board_center_x, board_center_y, inner_board_width,
-                                      inner_board_height, board_color, border_width)
+        arcade.draw_rectangle_filled(board_center_x, board_center_y, 
+                                     inner_board_width, inner_board_height, 
+                                     (204, 227, 199))
+
+        #draw logo
+        logo = arcade.load_texture("assets/logo.png")
+        logo_scale = (inner_board_width*(3/4))/600
+        logo_tilt_angle = -45
+        arcade.draw_scaled_texture_rectangle(self.width/2, self.height/2,
+                                             logo, logo_scale, logo_tilt_angle)
 
         #draw outer square of board
-        arcade.draw_rectangle_outline(board_center_x, board_center_y, outer_board_width,
-                                      outer_board_height, board_color, border_width)
+        arcade.draw_rectangle_outline(board_center_x, board_center_y,
+                                      outer_board_width, outer_board_height, 
+                                      board_color, border_width)
 
         #draw community chest
-        arcade.draw_rectangle_outline(225, 225, 40,
-                                      80, board_color, border_width, logo_tilt_angle - 90)
+        arcade.draw_rectangle_outline((SCREEN_WIDTH/2)+(inner_board_width/4),
+                                      (SCREEN_HEIGHT/2)+(inner_board_height/4),
+                                      tile_width, tile_width*2, 
+                                      board_color, 
+                                      border_width, 
+                                      logo_tilt_angle - 90)
 
         #draw chance
-        arcade.draw_rectangle_outline(375, 375, 40,
-                                      80, board_color, border_width, logo_tilt_angle - 90)
+        arcade.draw_rectangle_outline((SCREEN_WIDTH/2)-(inner_board_width/4), 
+                                      (SCREEN_HEIGHT/2)-(inner_board_height/4), 
+                                      tile_width, tile_width*2, 
+                                      board_color, 
+                                      border_width, 
+                                      logo_tilt_angle - 90)
 
         property = Property("test", "test", 0, [], 0, 0)
 
@@ -124,7 +135,7 @@ class Board(arcade.Window):
         self.squares[20].draw(right_corners_x, top_corners_y, bottom_tile_tilt)
 
         #reset column y
-        column_tile_y = 433
+        column_tile_y = SCREEN_HEIGHT-EDGE_SPACE-(tile_height+(tile_width/2))
 
         # call square for each tile in right column
         for i in range(21, num_tiles + 21):
@@ -136,7 +147,7 @@ class Board(arcade.Window):
         self.squares[30].draw(right_corners_x, bottom_corners_y, bottom_tile_tilt)
 
         #reset row x
-        row_tile_x = 433
+        row_tile_x = SCREEN_WIDTH-EDGE_SPACE-(tile_height+(tile_width/2))
 
         #call square for each tile in bottom row
         for i in range(31, num_tiles + 31):
