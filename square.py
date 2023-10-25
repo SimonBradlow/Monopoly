@@ -85,7 +85,7 @@ class Square():
             for s in self.sprite_list:
                 s.center_x = x
                 s.center_y = y
-                s.angle = angle
+                s.angle = angle-90
             self.sprite_list.draw()
 
         # House sprites
