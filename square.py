@@ -1,5 +1,6 @@
 from property import Property
 import arcade
+import math
 
 class Square():
     """
@@ -27,7 +28,7 @@ class Square():
         self.shape_list.append(background)
         self.shape_list.append(border)
 
-        # TODO: translate color string into RGB and fill inner with it
+        # Fill inner square with property color
         if self.property.group in self.color_names:
             inner = arcade.create_rectangle_filled(0, (height/8)*3, width, height/4, self.color_dict[self.property.group])
             inner_outline = arcade.create_rectangle_outline(0, (height/8)*3, width, height/4, arcade.color.BLACK, 1)
@@ -35,7 +36,7 @@ class Square():
             self.shape_list.append(inner_outline)
 
         # Initialize non-street sprites
-        scaling = (width-2)/204
+        scaling = (width-1)/204
         sprite_names = ["go", "jail", "freeparking", "gotojail"]
         fixed_name = self.property.name.lower().replace(" ", "")
         if fixed_name in sprite_names:
@@ -51,6 +52,23 @@ class Square():
             for i in range(5):
                 png_name = "assets/house" + str(i+1) + ".png"
                 self.house_sprites.append(arcade.Sprite(png_name, house_scaling))
+
+            # Text
+            split_text = self.property.name.upper()
+            split_text = "   " + split_text + "      $" + str(self.property.price)
+            unsplit_text = split_text.replace(" ", "\n")
+            self.nameText = arcade.create_text_sprite(
+                unsplit_text, 
+                0, 
+                0, 
+                arcade.color.BLACK, 
+                20,
+                font_name = "assets/KabelMediumRegular.ttf",
+                align="center",
+                anchor_x="center", 
+                anchor_y="center",
+            )
+            self.nameText.scale = self.width/260
 
     def draw(self, x, y, angle):
         # Set position and rotation of tile
@@ -81,3 +99,9 @@ class Square():
                     house.center_x, house.center_y,
                     x, y, angle)
                 house.draw()
+
+            # Draw name text sprite
+            self.nameText.center_x = x
+            self.nameText.center_y = y
+            self.nameText.angle = angle
+            self.nameText.draw()
