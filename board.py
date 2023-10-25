@@ -4,6 +4,7 @@ from property import Property
 from player import Player
 from collections import defaultdict
 import csv
+import random
 
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
