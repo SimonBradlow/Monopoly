@@ -1,14 +1,10 @@
 import arcade
 from square import Square
 from property import Property
+from gameOverView import GameOverView
 import csv
 
-SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Monopoly!"
-
-
-class Board(arcade.Window):
+class Board(arcade.View):
     """
     Main application class.
 
@@ -17,13 +13,19 @@ class Board(arcade.Window):
     with your own code. Don't leave 'pass' in this program.
     """
 
-    def __init__(self, width, height, title):
-        super().__init__(width, height, title)
+    def __init__(self):
+        super().__init__()
 
+        self.width = 600
+        self.height = 600
         arcade.set_background_color(arcade.color.AMAZON)
+
 
         # If you have sprite lists, you should create them here,
         # and set them to None
+
+    def on_show_view(self):
+        arcade.set_background_color(arcade.color.AMAZON)
 
     def setup(self):
         """ Set up the game variables. Call to re-start the game. """
@@ -79,7 +81,7 @@ class Board(arcade.Window):
         bottom_corners_y = 125
         right_corners_x = 475
         top_corners_y = 475
-
+        corner_tile_tilt = -90
 
         #draw logo
         arcade.draw_scaled_texture_rectangle(self.width/2, self.height/2, logo, logo_scale, logo_tilt_angle)
@@ -103,7 +105,7 @@ class Board(arcade.Window):
         property = Property("test", "test", 0, [], 0, 0)
 
         #draw go tile at position 0
-        self.squares[0].draw(left_corners_x, bottom_corners_y, bottom_tile_tilt)
+        self.squares[0].draw(left_corners_x, bottom_corners_y, corner_tile_tilt)
 
         # call square for each tile in left column
         for i in range(1, num_tiles + 1):
@@ -112,7 +114,7 @@ class Board(arcade.Window):
             column_tile_y += tile_width
 
         #draw jail tile at position 10
-        self.squares[10].draw(left_corners_x, top_corners_y, bottom_tile_tilt)
+        self.squares[10].draw(left_corners_x, top_corners_y, corner_tile_tilt)
 
         # call square for each tile in top row
         for i in range(11, num_tiles + 11):
@@ -121,7 +123,7 @@ class Board(arcade.Window):
             row_tile_x += tile_width
 
         #draw free parking tile at position 20
-        self.squares[20].draw(right_corners_x, top_corners_y, bottom_tile_tilt)
+        self.squares[20].draw(right_corners_x, top_corners_y, corner_tile_tilt)
 
         #reset column y
         column_tile_y = 433
@@ -133,7 +135,7 @@ class Board(arcade.Window):
             column_tile_y -= tile_width
 
         #draw go to jail at position 30
-        self.squares[30].draw(right_corners_x, bottom_corners_y, bottom_tile_tilt)
+        self.squares[30].draw(right_corners_x, bottom_corners_y, corner_tile_tilt)
 
         #reset row x
         row_tile_x = 433
@@ -161,10 +163,15 @@ class Board(arcade.Window):
         """
         Called whenever a key on the keyboard is pressed.
 
+
+
         For a full list of keys, see:
         https://api.arcade.academy/en/latest/arcade.key.html
         """
-        pass
+
+        if key == 65307:
+            board_view = GameOverView()
+            self.window.show_view(board_view)
 
     def on_key_release(self, key, key_modifiers):
         """
@@ -189,13 +196,3 @@ class Board(arcade.Window):
         Called when a user releases a mouse button.
         """
         pass
-
-
-def main():
-    """ Main function """
-    game = Board(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    game.setup()
-    arcade.run()
-
-if __name__ == "__main__":
-    main()
