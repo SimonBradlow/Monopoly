@@ -34,16 +34,13 @@ class Board():
                 elif line['Space'] in corner_names:
                     p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None)
                     width = height
-                if p is not None:
+                if p is not None and p.group not in corner_names + ['Tax', 'Chance', 'Chest']:
                     # Add the property to the list of properties
                     self.properties.append(p)
                     self.owners[p] = None
                     self.group_counts[p.group] += 1
                 # Add the square to the list of squares, was unsure what to initialize x/y/height/width to
                 self.squares.append(Square(int(line['Position']), p, width, height))
-        
-        self.players = []
-        self.turn = 0
 
     def draw(self):
         board_color = arcade.color.BLACK
