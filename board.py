@@ -138,3 +138,4 @@ class Board():
             self.squares[i].draw(row_tile_x, bottom_tile_y, bottom_tile_tilt)
 
             row_tile_x -= tile_width
+
