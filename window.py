@@ -1,4 +1,5 @@
 import arcade
+import arcade.gui
 from board import Board
 from views import StartView
 from views import PropertyView
@@ -29,10 +30,20 @@ class GameView(arcade.View):
         self.board = Board(SCREEN_WIDTH, SCREEN_HEIGHT, EDGE_SPACE)
 
         # Game information to track
-        self.players = []
+        self.players = [Player()]
+        self.properties = self.board.properties
+        self.owners = self.board.owners
         self.turn = 0
         self.doubles = 0
-        self.rolled = False
+        self.rolled = 0
+        self.rent_to_pay = False
+        self.rent_owed = 0
+
+        # Create UI manager
+        self.manager = arcade.gui.UIManager()
+        self.manager.enable()
+        self.update_buttons()
+
 
     def setup(self):
         """ Set up the game variables. Call to re-start the game. """
@@ -51,6 +62,9 @@ class GameView(arcade.View):
         # Call draw() on all your sprite lists below
         self.board.draw()
 
+        if type(self.active_player) is Player:
+            self.manager.draw()
+
     def on_update(self, delta_time):
         """
         All the logic to move, and the game logic goes here.
@@ -60,11 +74,10 @@ class GameView(arcade.View):
         # This is where you would check the win condition for GameOverView()
 
         # Check which player's turn it is
-        self.active_player = self.board.players[self.board.turn % len(self.board.players)]
+        self.active_player = self.players[self.turn % len(self.players)]
 
         # If human turn, handle human interaction
         if type(self.active_player) is Player:
-            # Determine where in the turn we are, and which buttons to draw
             pass
 
         # If computer turn, handle computer interaction
@@ -105,6 +118,37 @@ class GameView(arcade.View):
         Called when a user releases a mouse button.
         """
         pass
+
+    def on_roll_dice(self, event):
+        roll = self.board.roll()
+        self.rolled += 1
+        if roll[0] == roll[1]:
+            self.doubles +=1 
+        if self.doubles >= 3:
+            self.send_to_jail(self.active_player)
+        else:
+            self.board.move_player(self.active_player, roll[0] + roll[1])
+        self.update_buttons()
+    
+    def on_end_turn(self, event):
+        self.rolled = 0
+        self.doubles = 0
+        self.turn += 1
+        self.update_buttons()
+
+    def update_buttons(self):
+        self.manager.clear()
+        if self.rolled <= self.doubles:
+            action = arcade.gui.UIFlatButton(text="Roll Dice", width=200)
+            action.on_click = self.on_roll_dice
+        else:
+            action = arcade.gui.UIFlatButton(text="End Turn", width=200)
+            action.on_click = self.on_end_turn
+        self.manager.add(action)
+    
+    def send_to_jail(self, player):
+        pass
+            
 
 
 def main():
