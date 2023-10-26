@@ -3,6 +3,7 @@ from board import Board
 from views import StartView
 from views import PropertyView
 from views import GameOverView
+from player import Player
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
@@ -26,6 +27,12 @@ class GameView(arcade.View):
         # If you have sprite lists, you should create them here,
         # and set them to None
         self.board = Board(SCREEN_WIDTH, SCREEN_HEIGHT, EDGE_SPACE)
+
+        # Game information to track
+        self.players = []
+        self.turn = 0
+        self.doubles = 0
+        self.rolled = False
 
     def setup(self):
         """ Set up the game variables. Call to re-start the game. """
@@ -51,6 +58,19 @@ class GameView(arcade.View):
         need it.
         """
         # This is where you would check the win condition for GameOverView()
+
+        # Check which player's turn it is
+        self.active_player = self.board.players[self.board.turn % len(self.board.players)]
+
+        # If human turn, handle human interaction
+        if type(self.active_player) is Player:
+            # Determine where in the turn we are, and which buttons to draw
+            pass
+
+        # If computer turn, handle computer interaction
+        else:
+            pass
+        
         pass
 
     def on_key_press(self, key, key_modifiers):
