@@ -4,6 +4,7 @@ from property import Property
 from player import Player
 from collections import defaultdict
 import csv
+import random
 
 class Board():
     def __init__(self, w, h, e):
@@ -201,7 +202,7 @@ class Board():
         player.money += 200 * ((player.position + squares) // len(self.squares))
         player.position = (player.position + squares) % len(self.squares)
     
-    def roll():
+    def roll(self):
         roll1 = random.randint(1, 6)
         roll2 = random.randint(1, 6)
         rolls = (roll1, roll2)
