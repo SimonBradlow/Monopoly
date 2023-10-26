@@ -153,6 +153,7 @@ class Board():
 
             row_tile_x -= tile_width
 
+
     """Game Logic Functions"""
     def calculate_rent(self, p: Property, dice_total = None):
         """Calculate the rent owed for a certain property, if unowned or mortgaged rent is 0"""
