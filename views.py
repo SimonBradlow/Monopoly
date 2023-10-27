@@ -65,6 +65,7 @@ class GameView(arcade.View):
         self.rolled = 0
         self.rent_to_pay = False
         self.rent_owed = 0
+        self.active_player = None
 
         # Create UI manager
         self.manager = arcade.gui.UIManager()
