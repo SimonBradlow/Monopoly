@@ -57,7 +57,7 @@ class GameView(arcade.View):
         self.board = Board(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
 
         # Game information to track
-        self.players = [Player(0, self.board.tile_width)]
+        self.board.players = [Player(0,0, self.board.tile_width)]
         self.properties = self.board.properties
         self.owners = self.board.owners
         self.turn = 0
@@ -102,7 +102,7 @@ class GameView(arcade.View):
         # This is where you would check the win condition for GameOverView()
 
         # Check which player's turn it is
-        self.active_player = self.players[self.turn % len(self.players)]
+        self.active_player = self.board.players[self.turn % len(self.board.players)]
 
         # If human turn, handle human interaction
         if type(self.active_player) is Player:
