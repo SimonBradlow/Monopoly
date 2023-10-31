@@ -1,4 +1,7 @@
 import arcade
+from collections import defaultdict
+from typing import List
+from property import Property
 
 PIECE_LIST = ["car", "dog", "hat", "ship"]
 
@@ -6,9 +9,11 @@ class Player():
     """
     class representing individual player in monopoly
     """
-    def __init__(self, player, piece, scale):
-        self.player_no = player
-        self.board_pos = 0
+    def __init__(self, piece, scale, position: int =0, properties: list =[], money: int =1500, jailtime: int = 0):
+        self.position = position
+        self.properties = properties
+        self.money = money
+        self.jailtime = jailtime
 
         self.piece = piece
         self.sprite_list = arcade.SpriteList()
@@ -20,6 +25,14 @@ class Player():
         player_sprite.center_x = 0
         player_sprite.center_y = 0
         self.sprite_list.append(player_sprite)
+
+
+    def get_group_counts(self):
+        # Count how many of each type of property the player owns, return it as a defaultdict(int)
+        counts = defaultdict(int)
+        for p in self.properties:
+            counts[p.group] += 1
+        return counts
 
     def draw(self, x, y):
         for s in self.sprite_list:

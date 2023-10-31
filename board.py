@@ -2,16 +2,25 @@ import arcade
 from player import Player
 from square import Square
 from property import Property
+from player import Player
+from collections import defaultdict
 import csv
+import random
 
 class Board():
     def __init__(self, w, h, e):
         # Initialize squares list
         self.squares = []
+        # List of all properties kept for accessibility
+        self.properties = []
+        # Initialize dictionary to track property ownership
+        self.owners = {}
+        # Initialize a defaultdict(int) to count property types
+        self.group_counts = defaultdict(int)
         self.SCREEN_WIDTH = w
         self.SCREEN_HEIGHT = h
         self.EDGE_SPACE = e
-        tile_width = ((self.SCREEN_WIDTH-(self.EDGE_SPACE*2))*(3/4))/9
+        self.tile_width = ((self.SCREEN_WIDTH-(self.EDGE_SPACE*2))*(3/4))/9
         self.players = []
         with open('board.csv', mode ='r') as board_file:
             boardreader = csv.DictReader(board_file)
@@ -29,6 +38,11 @@ class Board():
                 elif line['Space'] in corner_names:
                     p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None)
                     width = height
+                if p is not None and p.group not in corner_names + ['Tax', 'Chance', 'Chest']:
+                    # Add the property to the list of properties
+                    self.properties.append(p)
+                    self.owners[p] = None
+                    self.group_counts[p.group] += 1
                 # Add the square to the list of squares, was unsure what to initialize x/y/height/width to
                 self.squares.append(Square(int(line['Position']), p, width, height))
 
@@ -102,14 +116,14 @@ class Board():
         #draw go tile at position 0
         self.squares[0].draw(left_corners_x, bottom_corners_y, bottom_tile_tilt)
         for p in self.players:
-            if p.board_pos == 0:
+            if p.position == 0:
                 p.draw(left_corners_x, bottom_corners_y)
 
         # call square for each tile in left column
         for i in range(1, num_tiles + 1):
             self.squares[i].draw(left_tile_x, column_tile_y, left_tile_tilt)
             for p in self.players:
-                if p.board_pos == i:
+                if p.position == i:
                     p.draw(left_tile_x, column_tile_y)
 
             column_tile_y += tile_width
@@ -117,7 +131,7 @@ class Board():
         #draw jail tile at position 10
         self.squares[10].draw(left_corners_x, top_corners_y, bottom_tile_tilt)
         for p in self.players:
-            if p.board_pos == 10:
+            if p.position == 10:
                 p.draw(left_corners_x, top_corners_y)
 
 
@@ -125,7 +139,7 @@ class Board():
         for i in range(11, num_tiles + 11):
             self.squares[i].draw(row_tile_x, top_tile_y, top_tile_tilt)
             for p in self.players:
-                if p.board_pos == i:
+                if p.position == i:
                     p.draw(row_tile_x, top_tile_y)
 
             row_tile_x += tile_width
@@ -133,7 +147,7 @@ class Board():
         #draw free parking tile at position 20
         self.squares[20].draw(right_corners_x, top_corners_y, bottom_tile_tilt)
         for p in self.players:
-            if p.board_pos == 20:
+            if p.position == 20:
                 p.draw(right_corners_x, top_corners_y)
 
 
@@ -144,7 +158,7 @@ class Board():
         for i in range(21, num_tiles + 21):
             self.squares[i].draw(right_tile_x, column_tile_y, right_tile_tilt)
             for p in self.players:
-                if p.board_pos == i:
+                if p.position == i:
                     p.draw(right_tile_x, column_tile_y)
 
             column_tile_y -= tile_width
@@ -152,7 +166,7 @@ class Board():
         #draw go to jail at position 30
         self.squares[30].draw(right_corners_x, bottom_corners_y, bottom_tile_tilt)
         for p in self.players:
-            if p.board_pos == 30:
+            if p.position == 30:
                 p.draw(left_corners_x, bottom_corners_y)
 
         #reset row x
@@ -162,8 +176,63 @@ class Board():
         for i in range(31, num_tiles + 31):
             self.squares[i].draw(row_tile_x, bottom_tile_y, bottom_tile_tilt)
             for p in self.players:
-                if p.board_pos == i:
+                if p.position == i:
                     p.draw(row_tile_x, bottom_tile_y)
 
             row_tile_x -= tile_width
 
+
+    """Game Logic Functions"""
+    def calculate_rent(self, p: Property, dice_total = None):
+        """Calculate the rent owed for a certain property, if unowned or mortgaged rent is 0"""
+        owner = self.owners[p]
+        if owner is None or p.mortgaged:
+            return 0
+        # If the property is a utility, rent depends on the dice rolled this turn
+        if p.group == "Utility":
+            if owner.get_group_counts(p.group) == 2:
+                return p.rents[1] * dice_total
+            else:
+                return p.rents[0] * dice_total
+        # If the property is a railroad, rent just depends on how many railroads the owner owns
+        elif p.group == "Railroad":
+            return p.rents[0] * owner.get_group_counts(p.group)
+        # Otherwise, rent depends on whether the player has a monopoly and the buildings on the property
+        else:
+            monopoly = owner.get_group_counts(p.group) == self.group_counts(p.group)
+            if monopoly and p.building_count == 0:
+                return p.rents[0] * 2
+            elif monopoly:
+                return p.rents[p.building_count]
+            else:
+                return p.rents[0]
+
+    def buy_property(self, property: Property, player: Player, price = None):
+        """
+        Handle the buying and selling of property, at base or any other price
+        If purchase goes through, returns True
+        If player cannot afford the property, returns False
+        """
+        if price is None:
+            price = property.price
+        if player.money < price:
+            return False
+        if self.owners[property] is not None:
+            self.owners[property].money += price
+        player.money -= price
+        self.owners[property] = player
+        return True
+
+    def move_player(self, player: Player, squares: int):
+        """
+        Move a player a given number of squares
+        Check if they pass go, if so they gain 200 money
+        """
+        player.money += 200 * ((player.position + squares) // len(self.squares))
+        player.position = (player.position + squares) % len(self.squares)
+    
+    def roll(self):
+        roll1 = random.randint(1, 6)
+        roll2 = random.randint(1, 6)
+        rolls = (roll1, roll2)
+        return rolls
