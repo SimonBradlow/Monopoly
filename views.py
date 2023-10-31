@@ -45,7 +45,7 @@ class GameView(arcade.View):
     with your own code. Don't leave 'pass' in this program.
     """
 
-    def __init__(self, SCREEN_WIDTH, SCREEN_HEIGHT, EDGE_SPACE):
+    def __init__(self, w, h, e):
         super().__init__()
         arcade.set_background_color(arcade.color.AMAZON)
         self.SCREEN_WIDTH = w
@@ -54,7 +54,7 @@ class GameView(arcade.View):
 
         # If you have sprite lists, you should create them here,
         # and set them to None
-        self.board = Board(SCREEN_WIDTH, SCREEN_HEIGHT, EDGE_SPACE)
+        self.board = Board(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
 
         # Game information to track
         self.players = [Player(0, self.board.tile_width)]
