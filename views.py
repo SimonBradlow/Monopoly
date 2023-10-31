@@ -55,6 +55,7 @@ class GameView(arcade.View):
         # If you have sprite lists, you should create them here,
         # and set them to None
         self.board = Board(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
+        self.mouse_sprite = arcade.SpriteSolidColor(1, 1, (0,0,0,0))
 
         # Game information to track
         self.board.players = [Player(0,0, self.board.tile_width)]
@@ -133,7 +134,14 @@ class GameView(arcade.View):
         """
         Called whenever the mouse moves.
         """
-        pass
+        self.mouse_sprite.center_x = x
+        self.mouse_sprite.center_y = y
+        for s in self.board.squares:
+            if arcade.check_for_collision(s.collision_sprite, self.mouse_sprite):
+                s.collision_sprite.color = (0,0,0,255)
+            else:
+                s.collision_sprite.color = (0,0,0,0)
+
 
     def on_mouse_press(self, x, y, button, key_modifiers):
         """

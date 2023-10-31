@@ -1,8 +1,8 @@
 import arcade
 from views import StartView
 
-SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 800
 EDGE_SPACE = 100
 SCREEN_TITLE = "Monopoly!"
 
