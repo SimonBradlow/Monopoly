@@ -1,4 +1,8 @@
 import arcade
+import arcade.gui
+import arcade.texture
+from PIL import Image
+
 from board import Board
 
 # START SCREEN VIEW
@@ -11,28 +15,79 @@ class StartView(arcade.View):
         self.SCREEN_HEIGHT = h
         self.EDGE_SPACE = e
 
+        # Create UI manager
+        self.manager = arcade.gui.UIManager()
+        self.manager.enable()
+        self.update_buttons()
+
+        # Create button textures
+        self.carImage = Image.open('assets/car.png')
+        self.carTexture = arcade.Texture(name="car", image=self.carImage)
+
         arcade.set_background_color(arcade.color.AMAZON)
-
-    #def on_show_view(self):
-
-
 
     def on_draw(self):
         self.clear()
-        arcade.draw_text("Welcome to Monopoly!", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2,
+        arcade.draw_text("Welcome to Monopoly!", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2 + 100,
                          arcade.color.WHITE_SMOKE, font_size=40, anchor_x="center")
-        arcade.draw_text("Click to advance", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2 - 75,
+        arcade.draw_text("Choose your piece", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2,
                          arcade.color.GRAY, font_size=20, anchor_x="center")
 
+        self.manager.draw()
+
     def on_mouse_press(self, _x, _y, _button, _modifiers):
+          pass
+
+    def update_buttons(self):
+        self.manager.clear()
+
+        #create buttons for piece selection
+        self.carPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="car", image=Image.open('assets/car.png')), width=100, height=100,
+                                           x=self.SCREEN_WIDTH/3 - 50, y=self.SCREEN_HEIGHT/4)
+        self.dogPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="dog", image=Image.open('assets/dog.png')), width=100, height=100,
+                                           x=self.SCREEN_WIDTH/3 + 150, y=self.SCREEN_HEIGHT/4)
+        self.hatPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="hat", image=Image.open('assets/hat.png')), width=100, height=100,
+                                           x=self.SCREEN_WIDTH/3 - 50, y=self.SCREEN_HEIGHT/4 - 150)
+        self.shipPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="ship", image=Image.open('assets/ship.png')), width=100,
+                                                    height=100, x=self.SCREEN_WIDTH/3 + 150, y=self.SCREEN_HEIGHT/4 - 150)
+
+        self.manager.add(self.carPiece)
+        self.manager.add(self.dogPiece)
+        self.manager.add(self.hatPiece)
+        self.manager.add(self.shipPiece)
+
+        self.carPiece.on_click = self.render_board
+        self.dogPiece.on_click = self.render_board
+        self.hatPiece.on_click = self.render_board
+        self.shipPiece.on_click = self.render_board
+
+    def render_board(self, event):
+
         game_view = GameView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
         game_view.setup()
         self.window.show_view(game_view)
 
+
 # PROPERTY CARD VIEW(?)
 class PropertyView(arcade.View):
+
+    def __init__(self, w, h, e, tile):
+        super().__init__()
+
+        self.SCREEN_WIDTH = w
+        self.SCREEN_HEIGHT = h
+        self.EDGE_SPACE = e
+        self.tileToView = tile
     def on_show_view(self):
-        pass
+
+        arcade.set_background_color(arcade.color.AMAZON)
+    def on_draw(self):
+        self.clear()
+        arcade.draw_text("Welcome to Monopoly!", self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2,
+                         arcade.color.WHITE_SMOKE, font_size=40, anchor_x="center")
+        arcade.draw_text("Click to advance", self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2 - 75,
+                         arcade.color.GRAY, font_size=20, anchor_x="center")
+
 
 class GameView(arcade.View):
     """
@@ -49,6 +104,9 @@ class GameView(arcade.View):
         self.SCREEN_WIDTH = w
         self.SCREEN_HEIGHT = h
         self.EDGE_SPACE = e
+        self.sprite_list = arcade.sprite_list
+        self.tiles = list[self.sprite_list]
+        self.displayTile = 0
 
         # If you have sprite lists, you should create them here,
         # and set them to None
@@ -102,19 +160,26 @@ class GameView(arcade.View):
         Called whenever the mouse moves.
         """
         pass
-
+"""
     def on_mouse_press(self, x, y, button, key_modifiers):
-        """
-        Called when the user presses a mouse button.
-        """
-        pass
+        # Called when the user presses a mouse button. 
+        print("here")
+        # Get list of cards we've clicked on
+        self.tiles = arcade.get_sprites_at_point((x, y), self.board.squares)
 
-    def on_mouse_release(self, x, y, button, key_modifiers):
-        """
-        Called when a user releases a mouse button.
-        """
-        pass
+        # Have we clicked on a card?
+        if len(self.tiles) > 0:
 
+            # All other cases, grab the face-up card we are clicking on
+            self.displayTile = self.tiles[0]
+
+        if len(self.tiles) == 0:
+            return
+
+        tile_view = PropertyView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE, self.tiles)
+        self.window.show_view(tile_view)
+
+"""
 # GAME OVER SCREEN VIEW
 class GameOverView(arcade.View):
     def on_show_view(self):
