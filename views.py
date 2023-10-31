@@ -48,6 +48,9 @@ class GameView(arcade.View):
     def __init__(self, SCREEN_WIDTH, SCREEN_HEIGHT, EDGE_SPACE):
         super().__init__()
         arcade.set_background_color(arcade.color.AMAZON)
+        self.SCREEN_WIDTH = w
+        self.SCREEN_HEIGHT = h
+        self.EDGE_SPACE = e
 
         # If you have sprite lists, you should create them here,
         # and set them to None
