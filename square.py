@@ -36,15 +36,39 @@ class Square():
             self.shape_list.append(inner_outline)
 
         # Initialize non-street sprites
-        scaling = (width-1)/204
-        sprite_names = ["go", "jail", "freeparking", "gotojail"]
-        fixed_name = self.property.name.lower().replace(" ", "")
-        if fixed_name in sprite_names:
-            png_name = "assets/" + fixed_name + ".png"
+        scaling = (height-1)/204
+        self.sprite_names = ["go", "jail", "freeparking", "gotojail", "communitychest", "incometax", "electriccompany", "waterworks", "luxurytax", "chance"]
+        self.fixed_name = self.property.name.lower().replace(" ", "")
+        if self.fixed_name in self.sprite_names:
+            png_name = "assets/" + self.fixed_name + ".png"
             tile_sprite = arcade.Sprite(png_name, scaling)
             tile_sprite.center_x = 0
             tile_sprite.center_y = 0
             self.sprite_list.append(tile_sprite)
+
+        # Initialize railroad sprites
+        if self.property.group == "Railroad":
+            tile_sprite = arcade.Sprite("assets/station.png", scaling)
+            tile_sprite.center_x = 0
+            tile_sprite.center_y = 0
+            self.sprite_list.append(tile_sprite)
+
+            # Railroad text
+            split_text = self.property.name.upper()
+            split_text = split_text + "         "
+            unsplit_text = split_text.replace(" ", "\n")
+            self.nameText = arcade.create_text_sprite(
+                unsplit_text, 
+                0, 
+                0, 
+                arcade.color.BLACK, 
+                20,
+                font_name = "assets/KabelMediumRegular.ttf",
+                align="center",
+                anchor_x="center", 
+                anchor_y="center",
+            )
+            self.nameText.scale = self.width/260
 
         # Initialize house sprites
         if self.property.group in self.color_names:
@@ -53,7 +77,7 @@ class Square():
                 png_name = "assets/house" + str(i+1) + ".png"
                 self.house_sprites.append(arcade.Sprite(png_name, house_scaling))
 
-            # Text
+            # Property text
             split_text = self.property.name.upper()
             split_text = "   " + split_text + "      $" + str(self.property.price)
             unsplit_text = split_text.replace(" ", "\n")
@@ -81,12 +105,20 @@ class Square():
 
         # Corner pieces
         # if self.property.name == "go"
-        if self.width == self.height:
+        if self.property.group not in self.color_names:
             for s in self.sprite_list:
                 s.center_x = x
                 s.center_y = y
-                s.angle = angle-90
+                s.angle = angle
+                if self.width == self.height:
+                    s.angle -= 90
             self.sprite_list.draw()
+
+        if self.property.group == "Railroad":
+            self.nameText.center_x = x
+            self.nameText.center_y = y
+            self.nameText.angle = angle
+            self.nameText.draw()
 
         # House sprites
         if self.property.group in self.color_names:

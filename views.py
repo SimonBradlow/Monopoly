@@ -110,9 +110,24 @@ class GameView(arcade.View):
 
         # If you have sprite lists, you should create them here,
         # and set them to None
-
-    def on_show_view(self):
         self.board = Board(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
+
+        # Game information to track
+        self.board.players = [Player(0,0, self.board.tile_width)]
+        self.properties = self.board.properties
+        self.owners = self.board.owners
+        self.turn = 0
+        self.doubles = 0
+        self.rolled = 0
+        self.rent_to_pay = False
+        self.rent_owed = 0
+        self.active_player = None
+
+        # Create UI manager
+        self.manager = arcade.gui.UIManager()
+        self.manager.enable()
+        self.update_buttons()
+
 
     def setup(self):
         """ Set up the game variables. Call to re-start the game. """
@@ -131,6 +146,9 @@ class GameView(arcade.View):
         # Call draw() on all your sprite lists below
         self.board.draw()
 
+        if type(self.active_player) is Player:
+            self.manager.draw()
+
     def on_update(self, delta_time):
         """
         All the logic to move, and the game logic goes here.
@@ -138,6 +156,18 @@ class GameView(arcade.View):
         need it.
         """
         # This is where you would check the win condition for GameOverView()
+
+        # Check which player's turn it is
+        self.active_player = self.board.players[self.turn % len(self.board.players)]
+
+        # If human turn, handle human interaction
+        if type(self.active_player) is Player:
+            pass
+
+        # If computer turn, handle computer interaction
+        else:
+            pass
+
         pass
 
     def on_key_press(self, key, key_modifiers):
@@ -160,24 +190,48 @@ class GameView(arcade.View):
         Called whenever the mouse moves.
         """
         pass
-"""
+
     def on_mouse_press(self, x, y, button, key_modifiers):
-        # Called when the user presses a mouse button. 
-        print("here")
-        # Get list of cards we've clicked on
-        self.tiles = arcade.get_sprites_at_point((x, y), self.board.squares)
+        """
+        Called when the user presses a mouse button.
+        """
+        pass
 
-        # Have we clicked on a card?
-        if len(self.tiles) > 0:
+    def on_mouse_release(self, x, y, button, key_modifiers):
+        """
+        Called when a user releases a mouse button.
+        """
+        pass
 
-            # All other cases, grab the face-up card we are clicking on
-            self.displayTile = self.tiles[0]
+    def on_roll_dice(self, event):
+        roll = self.board.roll()
+        self.rolled += 1
+        if roll[0] == roll[1]:
+            self.doubles +=1
+        if self.doubles >= 3:
+            self.send_to_jail(self.active_player)
+        else:
+            self.board.move_player(self.active_player, roll[0] + roll[1])
+        self.update_buttons()
 
-        if len(self.tiles) == 0:
-            return
+    def on_end_turn(self, event):
+        self.rolled = 0
+        self.doubles = 0
+        self.turn += 1
+        self.update_buttons()
 
-        tile_view = PropertyView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE, self.tiles)
-        self.window.show_view(tile_view)
+    def update_buttons(self):
+        self.manager.clear()
+        if self.rolled <= self.doubles:
+            action = arcade.gui.UIFlatButton(text="Roll Dice", width=200)
+            action.on_click = self.on_roll_dice
+        else:
+            action = arcade.gui.UIFlatButton(text="End Turn", width=200)
+            action.on_click = self.on_end_turn
+        self.manager.add(action)
+
+    def send_to_jail(self, player):
+        pass
 
 """
 # GAME OVER SCREEN VIEW
@@ -187,9 +241,9 @@ class GameOverView(arcade.View):
 
     def on_draw(self):
         self.clear()
-        """
-        Draw "Game over" across the screen.
-        """
+        
+        Draw Game over across the screen.
+        
         arcade.draw_text("Game Over", self.width/2 - 200, 400, arcade.color.WHITE, 54)
         arcade.draw_text("U suck!", self.width/2 - 50, 300, arcade.color.WHITE, 24)
 
@@ -200,3 +254,4 @@ class GameOverView(arcade.View):
                          arcade.color.GRAY,
                          font_size=15,
                          anchor_x="center")
+"""
