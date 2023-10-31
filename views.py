@@ -2,7 +2,7 @@ import arcade
 import arcade.gui
 import arcade.texture
 from PIL import Image
-
+from player import Player
 from board import Board
 
 # START SCREEN VIEW
@@ -42,14 +42,14 @@ class StartView(arcade.View):
         self.manager.clear()
 
         #create buttons for piece selection
-        self.carPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="car", image=Image.open('assets/car.png')), width=100, height=100,
-                                           x=self.SCREEN_WIDTH/3 - 50, y=self.SCREEN_HEIGHT/4)
+        self.carPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="car", image=Image.open('assets/car.png')), width=150, height=150,
+                                           x=self.SCREEN_WIDTH/3 - 75, y=self.SCREEN_HEIGHT/4 - 25)
         self.dogPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="dog", image=Image.open('assets/dog.png')), width=100, height=100,
                                            x=self.SCREEN_WIDTH/3 + 150, y=self.SCREEN_HEIGHT/4)
         self.hatPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="hat", image=Image.open('assets/hat.png')), width=100, height=100,
                                            x=self.SCREEN_WIDTH/3 - 50, y=self.SCREEN_HEIGHT/4 - 150)
-        self.shipPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="ship", image=Image.open('assets/ship.png')), width=100,
-                                                    height=100, x=self.SCREEN_WIDTH/3 + 150, y=self.SCREEN_HEIGHT/4 - 150)
+        self.shipPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="ship", image=Image.open('assets/ship.png')), width=200,
+                                                    height=200, x=self.SCREEN_WIDTH/3 + 100, y=self.SCREEN_HEIGHT/4 - 185)
 
         self.manager.add(self.carPiece)
         self.manager.add(self.dogPiece)
