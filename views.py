@@ -14,6 +14,7 @@ class StartView(arcade.View):
         self.SCREEN_WIDTH = w
         self.SCREEN_HEIGHT = h
         self.EDGE_SPACE = e
+        self.player_piece = 0
 
         # Create UI manager
         self.manager = arcade.gui.UIManager()
@@ -56,14 +57,25 @@ class StartView(arcade.View):
         self.manager.add(self.hatPiece)
         self.manager.add(self.shipPiece)
 
-        self.carPiece.on_click = self.render_board
-        self.dogPiece.on_click = self.render_board
-        self.hatPiece.on_click = self.render_board
-        self.shipPiece.on_click = self.render_board
+        self.carPiece.on_click = self.on_click_car
+        self.dogPiece.on_click = self.on_click_dog
+        self.hatPiece.on_click = self.on_click_hat
+        self.shipPiece.on_click = self.on_click_ship
 
-    def render_board(self, event):
-
-        game_view = GameView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
+    def on_click_car(self, event):
+        self.player_piece = 0
+        self.render_board()
+    def on_click_dog(self, event):
+        self.player_piece = 1
+        self.render_board()
+    def on_click_hat(self, event):
+        self.player_piece = 2
+        self.render_board()
+    def on_click_ship(self, event):
+        self.player_piece = 3
+        self.render_board()
+    def render_board(self):
+        game_view = GameView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE, self.player_piece)
         game_view.setup()
         self.window.show_view(game_view)
 
@@ -98,7 +110,7 @@ class GameView(arcade.View):
     with your own code. Don't leave 'pass' in this program.
     """
 
-    def __init__(self, w, h, e):
+    def __init__(self, w, h, e, p):
         super().__init__()
         arcade.set_background_color(arcade.color.AMAZON)
         self.SCREEN_WIDTH = w
@@ -107,13 +119,14 @@ class GameView(arcade.View):
         self.sprite_list = arcade.sprite_list
         self.tiles = list[self.sprite_list]
         self.displayTile = 0
+        self.player_piece = p
 
         # If you have sprite lists, you should create them here,
         # and set them to None
         self.board = Board(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
 
         # Game information to track
-        self.board.players = [Player(0,0, self.board.tile_width)]
+        self.board.players = [Player(0, self.player_piece, self.board.tile_width)]
         self.properties = self.board.properties
         self.owners = self.board.owners
         self.turn = 0
