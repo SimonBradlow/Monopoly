@@ -13,10 +13,10 @@ class Square():
         self.height = height
 
         # Initialize invisible sprite for mouse collision detection
-        self.collision_sprite = arcade.SpriteSolidColor(int(width), int(height), (0,0,0))
+        self.collision_sprite = arcade.SpriteSolidColor(int(width), int(height), (255,255,255))
         # For some reason, this functionality wont work if you initialize the 
         # sprite with a 4byte color, but setting it afterwards is fine
-        self.collision_sprite.color = (0,0,0,0)
+        self.collision_sprite.color = (255,255,255,0)
 
         # CODE BELOW IS NEEDED FOR Square.draw() METHOD
         # Initialize shape_list
