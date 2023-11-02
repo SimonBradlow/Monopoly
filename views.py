@@ -4,6 +4,7 @@ import arcade.texture
 from PIL import Image
 from player import Player
 from board import Board
+import custom_gui
 
 # START SCREEN VIEW
 class StartView(arcade.View):
@@ -234,6 +235,11 @@ class GameView(arcade.View):
         self.doubles = 0
         self.turn += 1
         self.update_buttons()
+    
+    def on_buy_property(self, event):
+        prop = self.board.squares[self.active_player.position].property
+        self.board.buy_property(prop, self.active_player)
+        self.update_buttons()
 
     def update_buttons(self):
         self.manager.clear()
@@ -260,9 +266,10 @@ class GameView(arcade.View):
                 if self.owners[self.board.squares[self.active_player.position].property] is None:
                     # Buy the property
                     square = arcade.gui.UIFlatButton(text=f"Buy {property_name}", width=self.button_width, height=self.button_height)
+                    square.on_click = self.on_buy_property
                 elif self.owners[self.board.squares[self.active_player.position].property] == self.active_player:
                     # Grey out buy button
-                    square = arcade.gui.UILabel(text=f"Buy {property_name}", width=self.button_width, height=self.button_height)
+                    square = custom_gui.BackgroundText(text=f"Buy {property_name}", width=self.button_width, height=self.button_height)
                 else:
                     # Pay rent
                     square = arcade.gui.UIFlatButton(text="Pay Rent", width=self.button_width, height=self.button_height)
