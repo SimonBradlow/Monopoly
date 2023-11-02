@@ -65,9 +65,11 @@ class GameView(arcade.View):
         self.rolled = 0
         self.rent_to_pay = False
         self.rent_owed = 0
-        self.active_player = None
+        self.active_player = self.players[0]
 
         # Create UI manager
+        self.button_width = 200
+        self.button_height = 50
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
         self.update_buttons()
@@ -166,13 +168,38 @@ class GameView(arcade.View):
 
     def update_buttons(self):
         self.manager.clear()
+        left_layout = arcade.gui.UIBoxLayout(vertical=True, x=0, y=100)
+        # Add action button (roll or end turn)
         if self.rolled <= self.doubles:
-            action = arcade.gui.UIFlatButton(text="Roll Dice", width=200)
+            action = arcade.gui.UIFlatButton(text="Roll Dice", width=self.button_width, height=self.button_height)
             action.on_click = self.on_roll_dice
         else:
-            action = arcade.gui.UIFlatButton(text="End Turn", width=200)
+            action = arcade.gui.UIFlatButton(text="End Turn", width=self.button_width, height=self.button_height)
             action.on_click = self.on_end_turn
-        self.manager.add(action)
+        left_layout.add(action)
+        # Add square action (buy property, pay rent, draw card, pay taxes)
+        square = None
+        if self.rolled > 0:
+            if self.board.squares[self.active_player.position].property.group == "Tax":
+                # Pay taxes
+                square = arcade.gui.UIFlatButton(text="Pay Taxes", width=self.button_width, height=self.button_height)
+            elif self.board.squares[self.active_player.position].property.group in ["Chance", "Chest"]:
+                # Draw a card
+                square = arcade.gui.UIFlatButton(text="Draw a card", width=self.button_width, height=self.button_height)
+            elif self.board.squares[self.active_player.position].property.group not in ['Go', 'Jail', 'Parking', 'GoToJail']:
+                property_name = self.board.squares[self.active_player.position].property.name
+                if self.owners[self.board.squares[self.active_player.position].property] is None:
+                    # Buy the property
+                    square = arcade.gui.UIFlatButton(text=f"Buy {property_name}", width=self.button_width, height=self.button_height)
+                elif self.owners[self.board.squares[self.active_player.position].property] == self.active_player:
+                    # Grey out buy button
+                    square = arcade.gui.UILabel(text=f"Buy {property_name}", width=self.button_width, height=self.button_height)
+                else:
+                    # Pay rent
+                    square = arcade.gui.UIFlatButton(text="Pay Rent", width=self.button_width, height=self.button_height)
+        if square is not None:
+            left_layout.add(square)
+        self.manager.add(left_layout)
     
     def send_to_jail(self, player):
         pass
