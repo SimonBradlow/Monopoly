@@ -90,6 +90,22 @@ class GameView(arcade.View):
 
         # Call draw() on all your sprite lists below
         self.board.draw()
+        for s in self.board.squares:
+            if s.property.render == True:
+                if self.mouse_sprite.center_x < self.SCREEN_WIDTH/2:
+                    if self.mouse_sprite.center_y < self.SCREEN_HEIGHT/2:
+                        s.property.draw(self.mouse_sprite.center_x+s.property.width/2, 
+                                        self.mouse_sprite.center_y+s.property.height/2)
+                    else:
+                        s.property.draw(self.mouse_sprite.center_x+s.property.width/2, 
+                                        self.mouse_sprite.center_y-s.property.height/2)
+                else:
+                    if self.mouse_sprite.center_y < self.SCREEN_HEIGHT/2:
+                        s.property.draw(self.mouse_sprite.center_x-s.property.width/2, 
+                                        self.mouse_sprite.center_y+s.property.height/2)
+                    else:
+                        s.property.draw(self.mouse_sprite.center_x-s.property.width/2, 
+                                        self.mouse_sprite.center_y-s.property.height/2)
 
         if type(self.active_player) is Player:
             self.manager.draw()
@@ -139,8 +155,10 @@ class GameView(arcade.View):
         for s in self.board.squares:
             if arcade.check_for_collision(s.collision_sprite, self.mouse_sprite):
                 s.collision_sprite.color = (255,255,255,75)
+                s.property.render = True
             else:
                 s.collision_sprite.color = (0,0,0,0)
+                s.property.render = False
 
 
     def on_mouse_press(self, x, y, button, key_modifiers):
