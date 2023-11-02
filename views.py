@@ -134,7 +134,7 @@ class GameView(arcade.View):
         self.rolled = 0
         self.rent_to_pay = False
         self.rent_owed = 0
-        self.active_player = self.players[0]
+        self.active_player = self.board.players[0]
 
         # Create UI manager
         self.button_width = 200
