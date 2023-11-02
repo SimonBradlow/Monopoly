@@ -1,7 +1,9 @@
 import arcade
 import arcade.gui
-from board import Board
+import arcade.texture
+from PIL import Image
 from player import Player
+from board import Board
 
 # START SCREEN VIEW
 class StartView(arcade.View):
@@ -12,29 +14,92 @@ class StartView(arcade.View):
         self.SCREEN_WIDTH = w
         self.SCREEN_HEIGHT = h
         self.EDGE_SPACE = e
+        self.player_piece = 0
+
+        # Create UI manager
+        self.manager = arcade.gui.UIManager()
+        self.manager.enable()
+        self.update_buttons()
+
+        # Create button textures
+        self.carImage = Image.open('assets/car.png')
+        self.carTexture = arcade.Texture(name="car", image=self.carImage)
 
         arcade.set_background_color(arcade.color.AMAZON)
 
-    #def on_show_view(self):
-
-
-
     def on_draw(self):
         self.clear()
-        arcade.draw_text("Welcome to Monopoly!", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2,
+        arcade.draw_text("Welcome to Monopoly!", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2 + 100,
                          arcade.color.WHITE_SMOKE, font_size=40, anchor_x="center")
-        arcade.draw_text("Click to advance", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2 - 75,
+        arcade.draw_text("Choose your piece", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2,
                          arcade.color.GRAY, font_size=20, anchor_x="center")
 
+        self.manager.draw()
+
     def on_mouse_press(self, _x, _y, _button, _modifiers):
-        game_view = GameView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
+          pass
+
+    def update_buttons(self):
+        self.manager.clear()
+
+        #create buttons for piece selection
+        self.carPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="car", image=Image.open('assets/car.png')), width=150, height=150,
+                                           x=self.SCREEN_WIDTH/3 - 75, y=self.SCREEN_HEIGHT/4 - 25)
+        self.dogPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="dog", image=Image.open('assets/dog.png')), width=100, height=100,
+                                           x=self.SCREEN_WIDTH/3 + 150, y=self.SCREEN_HEIGHT/4)
+        self.hatPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="hat", image=Image.open('assets/hat.png')), width=100, height=100,
+                                           x=self.SCREEN_WIDTH/3 - 50, y=self.SCREEN_HEIGHT/4 - 150)
+        self.shipPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="ship", image=Image.open('assets/ship.png')), width=200,
+                                                    height=200, x=self.SCREEN_WIDTH/3 + 100, y=self.SCREEN_HEIGHT/4 - 185)
+
+        self.manager.add(self.carPiece)
+        self.manager.add(self.dogPiece)
+        self.manager.add(self.hatPiece)
+        self.manager.add(self.shipPiece)
+
+        self.carPiece.on_click = self.on_click_car
+        self.dogPiece.on_click = self.on_click_dog
+        self.hatPiece.on_click = self.on_click_hat
+        self.shipPiece.on_click = self.on_click_ship
+
+    def on_click_car(self, event):
+        self.player_piece = 0
+        self.render_board()
+    def on_click_dog(self, event):
+        self.player_piece = 1
+        self.render_board()
+    def on_click_hat(self, event):
+        self.player_piece = 2
+        self.render_board()
+    def on_click_ship(self, event):
+        self.player_piece = 3
+        self.render_board()
+    def render_board(self):
+        game_view = GameView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE, self.player_piece)
         game_view.setup()
         self.window.show_view(game_view)
 
+
 # PROPERTY CARD VIEW(?)
 class PropertyView(arcade.View):
+
+    def __init__(self, w, h, e, tile):
+        super().__init__()
+
+        self.SCREEN_WIDTH = w
+        self.SCREEN_HEIGHT = h
+        self.EDGE_SPACE = e
+        self.tileToView = tile
     def on_show_view(self):
-        pass
+
+        arcade.set_background_color(arcade.color.AMAZON)
+    def on_draw(self):
+        self.clear()
+        arcade.draw_text("Welcome to Monopoly!", self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2,
+                         arcade.color.WHITE_SMOKE, font_size=40, anchor_x="center")
+        arcade.draw_text("Click to advance", self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2 - 75,
+                         arcade.color.GRAY, font_size=20, anchor_x="center")
+
 
 class GameView(arcade.View):
     """
@@ -45,19 +110,23 @@ class GameView(arcade.View):
     with your own code. Don't leave 'pass' in this program.
     """
 
-    def __init__(self, w, h, e):
+    def __init__(self, w, h, e, p):
         super().__init__()
         arcade.set_background_color(arcade.color.AMAZON)
         self.SCREEN_WIDTH = w
         self.SCREEN_HEIGHT = h
         self.EDGE_SPACE = e
+        self.sprite_list = arcade.sprite_list
+        self.tiles = list[self.sprite_list]
+        self.displayTile = 0
+        self.player_piece = p
 
         # If you have sprite lists, you should create them here,
         # and set them to None
-        self.board = Board(w, h, e)
+        self.board = Board(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
 
         # Game information to track
-        self.players = [Player()]
+        self.board.players = [Player(0, self.player_piece, self.board.tile_width)]
         self.properties = self.board.properties
         self.owners = self.board.owners
         self.turn = 0
@@ -104,7 +173,7 @@ class GameView(arcade.View):
         # This is where you would check the win condition for GameOverView()
 
         # Check which player's turn it is
-        self.active_player = self.players[self.turn % len(self.players)]
+        self.active_player = self.board.players[self.turn % len(self.board.players)]
 
         # If human turn, handle human interaction
         if type(self.active_player) is Player:
@@ -113,7 +182,7 @@ class GameView(arcade.View):
         # If computer turn, handle computer interaction
         else:
             pass
-        
+
         pass
 
     def on_key_press(self, key, key_modifiers):
@@ -153,13 +222,13 @@ class GameView(arcade.View):
         roll = self.board.roll()
         self.rolled += 1
         if roll[0] == roll[1]:
-            self.doubles +=1 
+            self.doubles +=1
         if self.doubles >= 3:
             self.send_to_jail(self.active_player)
         else:
             self.board.move_player(self.active_player, roll[0] + roll[1])
         self.update_buttons()
-    
+
     def on_end_turn(self, event):
         self.rolled = 0
         self.doubles = 0
@@ -204,6 +273,7 @@ class GameView(arcade.View):
     def send_to_jail(self, player):
         pass
 
+"""
 # GAME OVER SCREEN VIEW
 class GameOverView(arcade.View):
     def on_show_view(self):
@@ -211,9 +281,9 @@ class GameOverView(arcade.View):
 
     def on_draw(self):
         self.clear()
-        """
-        Draw "Game over" across the screen.
-        """
+        
+        Draw Game over across the screen.
+        
         arcade.draw_text("Game Over", self.width/2 - 200, 400, arcade.color.WHITE, 54)
         arcade.draw_text("U suck!", self.width/2 - 50, 300, arcade.color.WHITE, 24)
 
@@ -224,3 +294,4 @@ class GameOverView(arcade.View):
                          arcade.color.GRAY,
                          font_size=15,
                          anchor_x="center")
+"""
