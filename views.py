@@ -133,6 +133,8 @@ class GameView(arcade.View):
         self.turn = 0
         self.doubles = 0
         self.rolled = 0
+        self.taxes_to_pay = False
+        self.card_to_draw = False
         self.rent_to_pay = False
         self.rent_owed = 0
         self.active_player = self.board.players[0]
@@ -228,6 +230,16 @@ class GameView(arcade.View):
             self.send_to_jail(self.active_player)
         else:
             self.board.move_player(self.active_player, roll[0] + roll[1])
+            # Update game variables based on where the player ends up
+            if self.board.squares[self.active_player.position].property.group == "Tax":
+                self.taxes_to_pay = True
+            elif self.board.squares[self.active_player.position].property.group in ["Chance", "Chest"]:
+                self.card_to_draw = True
+            elif self.board.squares[self.active_player.position].property.group not in ["Go", "Jail", "Parking", "GoToJail"]:
+                if self.owners[self.board.squares[self.active_player.position].property] != self.active_player:
+                    self.rent_owed = self.board.calculate_rent(self.board.squares[self.active_player.position].property, roll)
+                    if self.rent_owed > 0:
+                        self.rent_to_pay = True
         self.update_buttons()
 
     def on_end_turn(self, event):
@@ -245,12 +257,16 @@ class GameView(arcade.View):
         self.manager.clear()
         left_layout = arcade.gui.UIBoxLayout(vertical=True, x=0, y=100)
         # Add action button (roll or end turn)
-        if self.rolled <= self.doubles:
+        if self.rolled <= self.doubles and True not in [self.card_to_draw, self.rent_to_pay, self.taxes_to_pay]:
             action = arcade.gui.UIFlatButton(text="Roll Dice", width=self.button_width, height=self.button_height)
             action.on_click = self.on_roll_dice
-        else:
+        elif self.rolled <= self.doubles:
+            action = custom_gui.BackgroundText(text="Roll Dice", height=self.button_height, width=self.button_width)
+        elif True not in [self.card_to_draw, self.rent_to_pay, self.taxes_to_pay]:
             action = arcade.gui.UIFlatButton(text="End Turn", width=self.button_width, height=self.button_height)
             action.on_click = self.on_end_turn
+        else:
+            action = custom_gui.BackgroundText(text="End Turn", width=self.button_width, height=self.button_height)
         left_layout.add(action)
         # Add square action (buy property, pay rent, draw card, pay taxes)
         square = None
