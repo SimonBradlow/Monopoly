@@ -221,6 +221,7 @@ class Board():
             self.owners[property].money += price
         player.money -= price
         self.owners[property] = player
+        player.properties.append(property)
         return True
 
     def move_player(self, player: Player, squares: int):
