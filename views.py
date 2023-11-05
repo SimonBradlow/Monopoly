@@ -293,9 +293,7 @@ class GameView(arcade.View):
         For a full list of keys, see:
         https://api.arcade.academy/en/latest/arcade.key.html
         """
-        if key == 65307:
-            property_view = PropertyView(self, self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE, self.active_player)
-            self.window.show_view(property_view)
+        pass
 
     def on_key_release(self, key, key_modifiers):
         """
