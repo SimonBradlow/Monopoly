@@ -42,14 +42,3 @@ class Deck():
             del self.cards[index]
             num_cards = num_cards - 1
             return card
-                    
-
-def main():
-    deck = Deck('Community Chest')
-    for i in range(len(deck.get_cards()) + 3):
-        card = deck.draw_card()
-        if card is not None:
-            print(card.return_effect(4))
-
-
-main()
