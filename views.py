@@ -245,6 +245,8 @@ class GameView(arcade.View):
         self.update_buttons()
 
     def on_end_turn(self, event):
+        if self.active_player.jailtime > 0:
+            self.active_player.jailtime += 1
         self.rolled = 0
         self.doubles = 0
         self.turn += 1
@@ -262,6 +264,7 @@ class GameView(arcade.View):
         owner.money += self.rent_owed
         self.rent_to_pay = False
         self.rent_owed = 0
+        self.update_buttons()
 
     def update_buttons(self):
         self.manager.remove(self.left_layout)
@@ -300,12 +303,17 @@ class GameView(arcade.View):
                     if self.rent_to_pay:
                         # Pay rent
                         square = arcade.gui.UIFlatButton(text=f"Pay ${self.rent_owed} Rent", width=self.button_width, height=self.button_height)
+                        square.on_click = self.on_pay_rent
+                    else:
+                        square = custom_gui.BackgroundText(text=f"No rent owed!", width=self.button_width, height=self.button_height)
         if square is not None:
             self.left_layout.add(square)
         self.manager.add(self.left_layout)
     
-    def send_to_jail(self, player):
-        pass
+    def send_to_jail(self, player: Player):
+        # Set the player's position to in jail
+        player.position = 30
+        player.jailtime = 1
 
 """
 # GAME OVER SCREEN VIEW
