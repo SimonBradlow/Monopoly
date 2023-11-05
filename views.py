@@ -295,11 +295,13 @@ class GameView(arcade.View):
             self.active_player.money -= 50
             self.active_player.jailtime = 0
             self.board.move_player(self.active_player, dice[0] + dice[1])
+        self.update_buttons()
 
     def on_pay_fine(self, event):
         # If the player chooses to pay their fine
         self.active_player.money -= 50
         self.active_player.jailtime = 0
+        self.update_buttons()
 
     def update_buttons(self):
         # Remove the old buttons
@@ -311,10 +313,12 @@ class GameView(arcade.View):
             if self.rolled == 0:
                 roll_action = arcade.gui.UIFlatButton(text="Roll for Doubles", width=self.button_width, height=self.button_height)
                 roll_action.on_click = self.on_roll_jail
+                pay_action = arcade.gui.UIFlatButton(text="Pay your $50 Fine", width=self.button_width, height=self.button_height)
+                pay_action.on_click = self.on_pay_fine
             else:
                 roll_action = custom_gui.BackgroundText(text="You have made your roll", width=self.button_width, height=self.button_height)
-            pay_action = arcade.gui.UIFlatButton(text="Pay your $50 Fine", width=self.button_width, height=self.button_height)
-            pay_action.on_click = self.on_pay_fine
+                pay_action = arcade.gui.UIFlatButton(text="End Turn", width=self.button_width, height=self.button_height)
+                pay_action.on_click = self.on_end_turn
             self.left_layout.add(roll_action)
             self.left_layout.add(pay_action)
         # If the player is not in jail, proceed normally
