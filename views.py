@@ -144,8 +144,10 @@ class GameView(arcade.View):
         self.button_height = 50
         self.manager = arcade.gui.UIManager()
         self.left_layout = arcade.gui.UIBoxLayout(vertical=True, x=0, y=100)
+        self.right_layout = arcade.gui.UIBoxLayout(vertical=True, x=self.SCREEN_WIDTH-self.button_width, y=100)
         self.manager.enable()
         self.manager.add(self.left_layout)
+        self.manager.add(self.right_layout)
         self.update_buttons()
 
 
@@ -265,9 +267,21 @@ class GameView(arcade.View):
         self.rent_to_pay = False
         self.rent_owed = 0
         self.update_buttons()
+    
+    def on_pay_taxes(self, event):
+        # Dummy function to pay taxes, doesn't actually remove money
+        self.taxes_to_pay = False
+        self.update_buttons()
+    
+    def on_draw_card(self, event):
+        # Dummy function to draw card, removes flag but doesn't actually draw the card
+        self.card_to_draw = False
+        self.update_buttons()
 
     def update_buttons(self):
+        # Remove the old buttons
         self.manager.remove(self.left_layout)
+        # Create the new container for the left buttons
         self.left_layout = arcade.gui.UIBoxLayout(vertical=True, x=0, y=100)
         # Add action button (roll or end turn)
         if self.rolled <= self.doubles and True not in [self.card_to_draw, self.rent_to_pay, self.taxes_to_pay]:
@@ -284,12 +298,18 @@ class GameView(arcade.View):
         # Add square action (buy property, pay rent, draw card, pay taxes)
         square = None
         if self.rolled > 0:
-            if self.board.squares[self.active_player.position].property.group == "Tax":
+            if self.board.squares[self.active_player.position].property.group == "Tax" and self.taxes_to_pay:
                 # Pay taxes
                 square = arcade.gui.UIFlatButton(text="Pay Taxes", width=self.button_width, height=self.button_height)
-            elif self.board.squares[self.active_player.position].property.group in ["Chance", "Chest"]:
+                square.on_click = self.on_pay_taxes
+            elif self.board.squares[self.active_player.position].property.group == "Tax":
+                square = custom_gui.BackgroundText(text="You have paid your tax!", width=self.button_width, height=self.button_height)
+            elif self.board.squares[self.active_player.position].property.group in ["Chance", "Chest"] and self.card_to_draw:
                 # Draw a card
                 square = arcade.gui.UIFlatButton(text="Draw a card", width=self.button_width, height=self.button_height)
+                square.on_click = self.on_draw_card
+            elif self.board.squares[self.active_player.position].property.group in ["Chance", "Chest"]:
+                square = custom_gui.BackgroundText(text="You have drawn your card!", width=self.button_width, height=self.button_height)
             elif self.board.squares[self.active_player.position].property.group not in ['Go', 'Jail', 'Parking', 'GoToJail']:
                 property_name = self.board.squares[self.active_player.position].property.name
                 if self.owners[self.board.squares[self.active_player.position].property] is None:
