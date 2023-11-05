@@ -111,7 +111,7 @@ class PropertyView(arcade.View):
     def on_draw(self):
         self.clear()
 
-        self.card_x = 100
+        self.card_x = self.tile_width/2
         self.card_y = self.SCREEN_HEIGHT-115
 
         for i in range(0, len(self.player.properties)):
@@ -122,12 +122,16 @@ class PropertyView(arcade.View):
                 self.card_y = self.SCREEN_HEIGHT-115
                 self.player.properties[i].draw(self.card_x, self.card_y)
             else:
-                self.card_x += 400
+                self.card_x += 200
                 self.card_y = self.SCREEN_HEIGHT-115
                 self.player.properties[i].draw(self.card_x, self.card_y)
             self.card_y -= 225
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == 65307:
+            arcade.set_viewport(self.view_top,
+                                self.SCREEN_HEIGHT + self.view_top,
+                                0,
+                                self.SCREEN_HEIGHT)
             self.window.show_view(self.game_view)
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
