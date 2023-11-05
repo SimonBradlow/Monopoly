@@ -278,6 +278,10 @@ class GameView(arcade.View):
         self.card_to_draw = False
         self.update_buttons()
 
+    def on_view_properties(self, event):
+        property_view = PropertyView(self, self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE, self.active_player)
+        self.window.show_view(property_view)
+        
     def update_buttons(self):
         # Remove the old buttons
         self.manager.remove(self.left_layout)
@@ -329,6 +333,14 @@ class GameView(arcade.View):
         if square is not None:
             self.left_layout.add(square)
         self.manager.add(self.left_layout)
+
+        # Manage the buttons on the right side of the screen
+        self.manager.remove(self.right_layout)
+        self.right_layout = arcade.gui.UIBoxLayout(vertical=True, x=self.SCREEN_WIDTH-self.button_width, y=100)
+        property_button = arcade.gui.UIFlatButton(text="View Properties", width=self.button_width, height=self.button_height)
+        property_button.on_click = self.on_view_properties
+        self.right_layout.add(property_button)
+        self.manager.add(self.right_layout)
     
     def send_to_jail(self, player: Player):
         # Set the player's position to in jail
