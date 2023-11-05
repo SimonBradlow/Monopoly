@@ -12,8 +12,15 @@ class Square():
         self.width = width
         self.height = height
 
+        # Initialize invisible sprite for mouse collision detection
+        self.collision_sprite = arcade.SpriteSolidColor(int(width), int(height), (255,255,255))
+        # For some reason, this functionality wont work if you initialize the 
+        # sprite with a 4byte color, but setting it afterwards is fine
+        self.collision_sprite.color = (255,255,255,0)
+
         # CODE BELOW IS NEEDED FOR Square.draw() METHOD
         # Initialize shape_list
+
         self.shape_list = arcade.ShapeElementList()
         self.sprite_list = arcade.SpriteList()
         self.house_sprites = []
@@ -96,6 +103,9 @@ class Square():
 
     def draw(self, x, y, angle):
         # Set position and rotation of tile
+        self.collision_sprite.center_x = x
+        self.collision_sprite.center_y = y
+        self.collision_sprite.angle = angle
         self.shape_list.center_x = x
         self.shape_list.center_y = y
         self.shape_list.angle = angle
@@ -137,3 +147,5 @@ class Square():
             self.nameText.center_y = y
             self.nameText.angle = angle
             self.nameText.draw()
+
+        self.collision_sprite.draw()

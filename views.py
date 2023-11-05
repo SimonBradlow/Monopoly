@@ -2,6 +2,8 @@ import arcade
 import arcade.gui
 import arcade.texture
 from PIL import Image
+
+import board
 from player import Player
 from board import Board
 import custom_gui
@@ -21,10 +23,6 @@ class StartView(arcade.View):
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
         self.update_buttons()
-
-        # Create button textures
-        self.carImage = Image.open('assets/car.png')
-        self.carTexture = arcade.Texture(name="car", image=self.carImage)
 
         arcade.set_background_color(arcade.color.AMAZON)
 
@@ -81,25 +79,101 @@ class StartView(arcade.View):
         self.window.show_view(game_view)
 
 
-# PROPERTY CARD VIEW(?)
+# PROPERTIES VIEW
 class PropertyView(arcade.View):
 
-    def __init__(self, w, h, e, tile):
+    def __init__(self, game_view, w, h, e, p):
         super().__init__()
 
         self.SCREEN_WIDTH = w
         self.SCREEN_HEIGHT = h
         self.EDGE_SPACE = e
-        self.tileToView = tile
-    def on_show_view(self):
+        self.player = p
+        self.game_view = game_view
+        self.tile_width = 200
+        self.tile_height = 225
 
+        self.mouse_sprite = arcade.SpriteSolidColor(1, 1, (0, 0, 0, 0))
+
+        #margins for scrolling through properties
+        self.top_viewport_margin = 20
+        self.bottom_viewport_margin = 20
+        self.view_bottom = 0
+        self.view_top = 0
+        self.changed = False
+        self.card_x = 0
+        self.card_y = 0
+
+
+    def on_show_view(self):
         arcade.set_background_color(arcade.color.AMAZON)
+
     def on_draw(self):
         self.clear()
-        arcade.draw_text("Welcome to Monopoly!", self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2,
-                         arcade.color.WHITE_SMOKE, font_size=40, anchor_x="center")
-        arcade.draw_text("Click to advance", self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2 - 75,
-                         arcade.color.GRAY, font_size=20, anchor_x="center")
+
+        # set where a card is initially rendered in the property view
+        self.card_x = self.tile_width/2
+        self.card_y = self.SCREEN_HEIGHT-115
+
+        # Placing cards on the screen, currently hard coded but
+        # should be made more dynamic to fit varying window sizes eventually
+        for i in range(0, len(self.player.properties)):
+            # For the first 5 cards, put it in one column.
+            if i <= 4:
+                self.player.properties[i].draw(self.card_x, self.card_y)
+            # Next 4(?) cards go in the next column.
+            elif i > 4 and i <= 8:
+                self.card_x += 200
+                self.card_y = self.SCREEN_HEIGHT-115
+                self.player.properties[i].draw(self.card_x, self.card_y)
+            else:
+                self.card_x += 200
+                self.card_y = self.SCREEN_HEIGHT-115
+                self.player.properties[i].draw(self.card_x, self.card_y)
+            self.card_y -= 225
+    def on_key_press(self, symbol: int, modifiers: int):
+        # if player presses esc button the view returns to board.
+        if symbol == 65307:
+            # resetting view so board is rendered back in the center of the screen.
+            arcade.set_viewport(self.view_top,
+                                self.SCREEN_HEIGHT + self.view_top,
+                                0,
+                                self.SCREEN_HEIGHT)
+            self.window.show_view(self.game_view)
+
+    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
+
+        self.mouse_sprite.center_x = x
+        self.mouse_sprite.center_y = y
+
+        # set boundary for window scrolling
+        self.top_boundary = self.view_bottom + self.SCREEN_HEIGHT - self.top_viewport_margin
+        self.bottom_boundary = self.view_bottom + self.SCREEN_HEIGHT - self.bottom_viewport_margin
+
+        # check if scroll up is needed
+        if self.mouse_sprite.center_y > self.top_boundary:
+            self.view_bottom += self.mouse_sprite.center_y - self.top_boundary
+            self.changed = True
+
+        # check if scroll down is needed
+        if self.mouse_sprite.center_y < self.bottom_boundary:
+            self.view_bottom -= self.bottom_boundary - self.mouse_sprite.center_y
+            self.changed = True
+
+        # if scroll is needed
+        if self.changed:
+            #cast viewport to integers so it doesn't mess with pixels
+            self.view_bottom = int(self.view_bottom)
+            self.view_top = int(self.view_top)
+
+            # actually do the scroll
+            arcade.set_viewport(self.view_top,
+                                self.SCREEN_HEIGHT + self.view_top,
+                                self.view_bottom,
+                                self.SCREEN_HEIGHT + self.view_bottom)
+
+
+
 
 
 class GameView(arcade.View):
@@ -125,6 +199,7 @@ class GameView(arcade.View):
         # If you have sprite lists, you should create them here,
         # and set them to None
         self.board = Board(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
+        self.mouse_sprite = arcade.SpriteSolidColor(1, 1, (0,0,0,0))
 
         # Game information to track
         self.board.players = [Player(0, self.player_piece, self.board.tile_width)]
@@ -151,9 +226,12 @@ class GameView(arcade.View):
         self.update_buttons()
 
 
-    def setup(self):
+    def on_show_view(self):
         """ Set up the game variables. Call to re-start the game. """
         # Create your sprites and sprite lists here
+        pass
+
+    def setup(self):
         pass
 
     def on_draw(self):
@@ -167,6 +245,22 @@ class GameView(arcade.View):
 
         # Call draw() on all your sprite lists below
         self.board.draw()
+        for s in self.board.squares:
+            if s.property.render == True:
+                if self.mouse_sprite.center_x < self.SCREEN_WIDTH/2:
+                    if self.mouse_sprite.center_y < self.SCREEN_HEIGHT/2:
+                        s.property.draw(self.mouse_sprite.center_x+s.property.width/2, 
+                                        self.mouse_sprite.center_y+s.property.height/2)
+                    else:
+                        s.property.draw(self.mouse_sprite.center_x+s.property.width/2, 
+                                        self.mouse_sprite.center_y-s.property.height/2)
+                else:
+                    if self.mouse_sprite.center_y < self.SCREEN_HEIGHT/2:
+                        s.property.draw(self.mouse_sprite.center_x-s.property.width/2, 
+                                        self.mouse_sprite.center_y+s.property.height/2)
+                    else:
+                        s.property.draw(self.mouse_sprite.center_x-s.property.width/2, 
+                                        self.mouse_sprite.center_y-s.property.height/2)
 
         if type(self.active_player) is Player:
             self.manager.draw()
@@ -199,7 +293,9 @@ class GameView(arcade.View):
         For a full list of keys, see:
         https://api.arcade.academy/en/latest/arcade.key.html
         """
-        pass
+        if key == 65307:
+            property_view = PropertyView(self, self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE, self.active_player)
+            self.window.show_view(property_view)
 
     def on_key_release(self, key, key_modifiers):
         """
@@ -211,7 +307,16 @@ class GameView(arcade.View):
         """
         Called whenever the mouse moves.
         """
-        pass
+        self.mouse_sprite.center_x = x
+        self.mouse_sprite.center_y = y
+        for s in self.board.squares:
+            if arcade.check_for_collision(s.collision_sprite, self.mouse_sprite):
+                s.collision_sprite.color = (255,255,255,75)
+                s.property.render = True
+            else:
+                s.collision_sprite.color = (0,0,0,0)
+                s.property.render = False
+
 
     def on_mouse_press(self, x, y, button, key_modifiers):
         """
@@ -383,16 +488,27 @@ class GameView(arcade.View):
         player.position = 10
         player.jailtime = 1
 
-"""
+
+
+
 # GAME OVER SCREEN VIEW
 class GameOverView(arcade.View):
-    def on_show_view(self):
+
+    def __init__(self, w, h, e):
+        super.__init__()
+
         arcade.set_background_color(arcade.color.BLACK)
+        self.SCREEN_HEIGHT = w
+        self.SCREEN_WIDTH = h
+        self.EDGE_SPACE = e
+
+    def setup(self):
+        pass
+    def on_show_view(self):
+        pass
 
     def on_draw(self):
         self.clear()
-        
-        Draw Game over across the screen.
         
         arcade.draw_text("Game Over", self.width/2 - 200, 400, arcade.color.WHITE, 54)
         arcade.draw_text("U suck!", self.width/2 - 50, 300, arcade.color.WHITE, 24)
@@ -404,4 +520,3 @@ class GameOverView(arcade.View):
                          arcade.color.GRAY,
                          font_size=15,
                          anchor_x="center")
-"""
