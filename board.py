@@ -32,7 +32,7 @@ class Board():
                 corner_names = ['Go', 'Jail', 'Parking', 'GoToJail']
                 non_property_names = ['Railroad', 'Utility', 'Tax', 'Chance', 'Chest']
                 if line['Space'] == 'Street':
-                    p = Property(line['Name'], line['Color'], int(line['Price']), [int(line['Rent'])] + [int(line[f'RentBuild{i}']) for i in range(1, 6)], None, None)
+                    p = Property(line['Name'], line['Color'], int(line['Price']), [int(line['Rent'])] + [int(line[f'RentBuild{i}']) for i in range(1, 6)], int(line['PriceBuild']), None)
                 elif line['Space'] in non_property_names:
                     p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None)
                 elif line['Space'] in corner_names:
