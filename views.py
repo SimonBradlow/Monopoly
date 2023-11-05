@@ -111,12 +111,17 @@ class PropertyView(arcade.View):
     def on_draw(self):
         self.clear()
 
+        # set where a card is initially rendered in the property view
         self.card_x = self.tile_width/2
         self.card_y = self.SCREEN_HEIGHT-115
 
+        # Placing cards on the screen, currently hard coded but
+        # should be made more dynamic to fit varying window sizes eventually
         for i in range(0, len(self.player.properties)):
+            # For the first 5 cards, put it in one column.
             if i <= 4:
                 self.player.properties[i].draw(self.card_x, self.card_y)
+            # Next 4(?) cards go in the next column.
             elif i > 4 and i <= 8:
                 self.card_x += 200
                 self.card_y = self.SCREEN_HEIGHT-115
@@ -127,7 +132,9 @@ class PropertyView(arcade.View):
                 self.player.properties[i].draw(self.card_x, self.card_y)
             self.card_y -= 225
     def on_key_press(self, symbol: int, modifiers: int):
+        # if player presses esc button the view returns to board.
         if symbol == 65307:
+            # resetting view so board is rendered back in the center of the screen.
             arcade.set_viewport(self.view_top,
                                 self.SCREEN_HEIGHT + self.view_top,
                                 0,
@@ -139,21 +146,27 @@ class PropertyView(arcade.View):
         self.mouse_sprite.center_x = x
         self.mouse_sprite.center_y = y
 
+        # set boundary for window scrolling
         self.top_boundary = self.view_bottom + self.SCREEN_HEIGHT - self.top_viewport_margin
         self.bottom_boundary = self.view_bottom + self.SCREEN_HEIGHT - self.bottom_viewport_margin
 
+        # check if scroll up is needed
         if self.mouse_sprite.center_y > self.top_boundary:
             self.view_bottom += self.mouse_sprite.center_y - self.top_boundary
             self.changed = True
 
+        # check if scroll down is needed
         if self.mouse_sprite.center_y < self.bottom_boundary:
             self.view_bottom -= self.bottom_boundary - self.mouse_sprite.center_y
             self.changed = True
 
+        # if scroll is needed
         if self.changed:
+            #cast viewport to integers so it doesn't mess with pixels
             self.view_bottom = int(self.view_bottom)
             self.view_top = int(self.view_top)
 
+            # actually do the scroll
             arcade.set_viewport(self.view_top,
                                 self.SCREEN_HEIGHT + self.view_top,
                                 self.view_bottom,
