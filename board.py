@@ -1,4 +1,5 @@
 import arcade
+from player import Player
 from square import Square
 from property import Property
 from player import Player
@@ -19,6 +20,8 @@ class Board():
         self.SCREEN_WIDTH = w
         self.SCREEN_HEIGHT = h
         self.EDGE_SPACE = e
+        self.tile_width = ((self.SCREEN_WIDTH-(self.EDGE_SPACE*2))*(3/4))/9
+        self.players = []
         with open('board.csv', mode ='r') as board_file:
             boardreader = csv.DictReader(board_file)
             for line in boardreader:
@@ -112,24 +115,41 @@ class Board():
 
         #draw go tile at position 0
         self.squares[0].draw(left_corners_x, bottom_corners_y, bottom_tile_tilt)
+        for p in self.players:
+            if p.position == 0:
+                p.draw(left_corners_x, bottom_corners_y)
 
         # call square for each tile in left column
         for i in range(1, num_tiles + 1):
             self.squares[i].draw(left_tile_x, column_tile_y, left_tile_tilt)
+            for p in self.players:
+                if p.position == i:
+                    p.draw(left_tile_x, column_tile_y)
 
             column_tile_y += tile_width
 
         #draw jail tile at position 10
         self.squares[10].draw(left_corners_x, top_corners_y, bottom_tile_tilt)
+        for p in self.players:
+            if p.position == 10:
+                p.draw(left_corners_x, top_corners_y)
+
 
         # call square for each tile in top row
         for i in range(11, num_tiles + 11):
             self.squares[i].draw(row_tile_x, top_tile_y, top_tile_tilt)
+            for p in self.players:
+                if p.position == i:
+                    p.draw(row_tile_x, top_tile_y)
 
             row_tile_x += tile_width
 
         #draw free parking tile at position 20
         self.squares[20].draw(right_corners_x, top_corners_y, bottom_tile_tilt)
+        for p in self.players:
+            if p.position == 20:
+                p.draw(right_corners_x, top_corners_y)
+
 
         #reset column y
         column_tile_y = self.SCREEN_HEIGHT-self.EDGE_SPACE-(tile_height+(tile_width/2))
@@ -137,19 +157,27 @@ class Board():
         # call square for each tile in right column
         for i in range(21, num_tiles + 21):
             self.squares[i].draw(right_tile_x, column_tile_y, right_tile_tilt)
+            for p in self.players:
+                if p.position == i:
+                    p.draw(right_tile_x, column_tile_y)
 
             column_tile_y -= tile_width
 
         #draw go to jail at position 30
         self.squares[30].draw(right_corners_x, bottom_corners_y, bottom_tile_tilt)
+        for p in self.players:
+            if p.position == 30:
+                p.draw(left_corners_x, bottom_corners_y)
 
         #reset row x
         row_tile_x = self.SCREEN_WIDTH-self.EDGE_SPACE-(tile_height+(tile_width/2))
 
         #call square for each tile in bottom row
         for i in range(31, num_tiles + 31):
-
             self.squares[i].draw(row_tile_x, bottom_tile_y, bottom_tile_tilt)
+            for p in self.players:
+                if p.position == i:
+                    p.draw(row_tile_x, bottom_tile_y)
 
             row_tile_x -= tile_width
 
