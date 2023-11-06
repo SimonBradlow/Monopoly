@@ -7,6 +7,7 @@ import board
 from player import Player
 from board import Board
 import custom_gui
+import random
 
 # START SCREEN VIEW
 class StartView(arcade.View):
@@ -19,7 +20,7 @@ class StartView(arcade.View):
         self.EDGE_SPACE = e
         self.player_piece = 0
 
-        # Create UI manager
+# Create UI manager
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
         self.update_buttons()
@@ -199,6 +200,8 @@ class GameView(arcade.View):
         # and set them to None
         self.board = Board(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
         self.mouse_sprite = arcade.SpriteSolidColor(1, 1, (0,0,0,0))
+        self.die_sprites = arcade.SpriteList()
+
 
         # Game information to track
         self.board.players = [Player(0, self.player_piece, self.board.tile_width)]
@@ -244,6 +247,7 @@ class GameView(arcade.View):
 
         # Call draw() on all your sprite lists below
         self.board.draw()
+        self.die_sprites.draw()
         for s in self.board.squares:
             if s.property.render == True:
                 if self.mouse_sprite.center_x < self.SCREEN_WIDTH/2:
@@ -329,6 +333,30 @@ class GameView(arcade.View):
 
     def on_roll_dice(self, event):
         roll = self.board.roll()
+
+        # DICE RENDER FUNCTIONALITY
+        self.die_sprites.clear()
+        die_list = []
+        i = 0
+        while i < 2:
+            scaling = (self.board.tile_width/1.5)/350
+            png_name = "assets/die" + str(roll[i]) + ".png"
+            die_sprite = arcade.Sprite(png_name, scaling)
+            rand_x = random.randint((self.board.tile_width*3)*(-1), self.board.tile_width*3)
+            rand_y = random.randint((self.board.tile_width*3)*(-1), self.board.tile_width*3)
+            die_sprite.center_x = self.SCREEN_WIDTH/2 + rand_x
+            die_sprite.center_y = self.SCREEN_WIDTH/2 + rand_y
+            die_sprite.angle = random.randint(0, 90)
+            die_list.append(die_sprite)
+            # Check for overlapping dice and restart if so
+            if (i == 1) and (arcade.check_for_collision(die_list[0], die_list[1])):
+                die_list.clear()
+                i = 0
+            else:
+                i += 1
+        for s in die_list:
+            self.die_sprites.append(s)
+
         self.rolled += 1
         if roll[0] == roll[1]:
             self.doubles +=1
