@@ -192,7 +192,6 @@ class GameView(arcade.View):
         self.SCREEN_HEIGHT = h
         self.EDGE_SPACE = e
         self.sprite_list = arcade.sprite_list
-        self.tiles = list[self.sprite_list]
         self.displayTile = 0
         self.player_piece = p
 
