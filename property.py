@@ -74,7 +74,7 @@ class Property():
                     rent_string += "s"
                 rent_string += "        $"
                 rent_string += str(self.rents[i]) + "\n"
-            rent_string += "With HOTEL $" + str(self.rents[i]) + "\n\n"
+            rent_string += "With HOTEL $" + str(self.rents[5]) + "\n\n"
             rent_string += "Mortgage Value $" + str(self.price//2) + "\n"
             rent_string += "Houses cost $" + str(self.building_cost) + ". each\n"
             rent_string += "Hotels, $" + str(self.building_cost) + ". plus 4 houses\n"
