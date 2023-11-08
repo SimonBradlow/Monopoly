@@ -43,24 +43,32 @@ class StartView(arcade.View):
         self.manager.clear()
 
         #create buttons for piece selection
-        self.carPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="car", image=Image.open('assets/car.png')), width=150, height=150,
-                                           x=self.SCREEN_WIDTH/3 - 75, y=self.SCREEN_HEIGHT/4 - 25)
-        self.dogPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="dog", image=Image.open('assets/dog.png')), width=100, height=100,
-                                           x=self.SCREEN_WIDTH/3 + 150, y=self.SCREEN_HEIGHT/4)
-        self.hatPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="hat", image=Image.open('assets/hat.png')), width=100, height=100,
-                                           x=self.SCREEN_WIDTH/3 - 50, y=self.SCREEN_HEIGHT/4 - 150)
-        self.shipPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="ship", image=Image.open('assets/ship.png')), width=200,
-                                                    height=200, x=self.SCREEN_WIDTH/3 + 100, y=self.SCREEN_HEIGHT/4 - 185)
+        self.carPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="car", image=Image.open('assets/car.png')), width=100, height=100, x=((self.SCREEN_WIDTH/8)-50), y=(((self.SCREEN_HEIGHT/8)*3)-50))
+        self.dogPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="dog", image=Image.open('assets/dog.png')), width=100, height=100, x=((self.SCREEN_WIDTH/8)*3)-50, y=(((self.SCREEN_HEIGHT/8)*3)-50))
+        self.hatPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="hat", image=Image.open('assets/hat.png')), width=100, height=100, x=((self.SCREEN_WIDTH/8)*5)-50, y=(((self.SCREEN_HEIGHT/8)*3)-50))
+        self.shipPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="ship", image=Image.open('assets/ship.png')), width=100, height=100, x=((self.SCREEN_WIDTH/8)*7)-50, y=((self.SCREEN_HEIGHT/8)*3)-50)
+        self.bootPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="boot", image=Image.open('assets/boot.png')), width=100, height=100, x=((self.SCREEN_WIDTH/8)-50), y=((self.SCREEN_HEIGHT/8)-50))
+        self.ironPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="iron", image=Image.open('assets/iron.png')), width=100, height=100, x=((self.SCREEN_WIDTH/8)*3)-50, y=((self.SCREEN_HEIGHT/8)-50))
+        self.thimblePiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="thimble", image=Image.open('assets/thimble.png')), width=100, height=100, x=((self.SCREEN_WIDTH/8)*5)-50, y=((self.SCREEN_HEIGHT/8)-50))
+        self.wheelbarrowPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="wheelbarrow", image=Image.open('assets/wheelbarrow.png')), width=100, height=100, x=((self.SCREEN_WIDTH/8)*7)-50, y=((self.SCREEN_HEIGHT/8)-50))
 
         self.manager.add(self.carPiece)
         self.manager.add(self.dogPiece)
         self.manager.add(self.hatPiece)
         self.manager.add(self.shipPiece)
+        self.manager.add(self.bootPiece)
+        self.manager.add(self.ironPiece)
+        self.manager.add(self.thimblePiece)
+        self.manager.add(self.wheelbarrowPiece)
 
         self.carPiece.on_click = self.on_click_car
         self.dogPiece.on_click = self.on_click_dog
         self.hatPiece.on_click = self.on_click_hat
         self.shipPiece.on_click = self.on_click_ship
+        self.bootPiece.on_click = self.on_click_boot
+        self.ironPiece.on_click = self.on_click_iron
+        self.thimblePiece.on_click = self.on_click_thimble
+        self.wheelbarrowPiece.on_click = self.on_click_wheelbarrow
 
     def on_click_car(self, event):
         self.player_piece = 0
@@ -74,6 +82,19 @@ class StartView(arcade.View):
     def on_click_ship(self, event):
         self.player_piece = 3
         self.render_board()
+    def on_click_boot(self, event):
+        self.player_piece = 4
+        self.render_board()
+    def on_click_iron(self, event):
+        self.player_piece = 5
+        self.render_board()
+    def on_click_thimble(self, event):
+        self.player_piece = 6
+        self.render_board()
+    def on_click_wheelbarrow(self, event):
+        self.player_piece = 7
+        self.render_board()
+
     def render_board(self):
         game_view = GameView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE, self.player_piece)
         game_view.setup()

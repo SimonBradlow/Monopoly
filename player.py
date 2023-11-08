@@ -3,7 +3,7 @@ from collections import defaultdict
 from typing import List
 from property import Property
 
-PIECE_LIST = ["car", "dog", "hat", "ship"]
+PIECE_LIST = ["car", "dog", "hat", "ship", "boot", "iron", "thimble", "wheelbarrow"]
 
 class Player():
     """
