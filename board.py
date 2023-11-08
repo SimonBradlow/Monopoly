@@ -84,10 +84,10 @@ class Board():
 
         #draw logo
         logo = arcade.load_texture("assets/logo.png")
-        logo_scale = (inner_board_width*(3/4))/600
+        logo_scale = (inner_board_width*(3/4))/2036
         logo_tilt_angle = -45
-        arcade.draw_scaled_texture_rectangle(self.SCREEN_WIDTH/2, 
-                                             self.SCREEN_HEIGHT/2,
+        arcade.draw_scaled_texture_rectangle((self.SCREEN_WIDTH/2)+(125*logo_scale), 
+                                             (self.SCREEN_HEIGHT/2)+(125*logo_scale),
                                              logo, logo_scale, logo_tilt_angle)
 
         #draw outer square of board
