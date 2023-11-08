@@ -20,7 +20,7 @@ class Player():
         self.sprite_list = arcade.SpriteList()
         
         self.scale = scale
-        scaling = (scale/2)/200
+        scaling = (scale/2)/400
         png_name = "assets/" + PIECE_LIST[self.piece] + ".png"
         player_sprite = arcade.Sprite(png_name, scaling)
         player_sprite.center_x = 0
