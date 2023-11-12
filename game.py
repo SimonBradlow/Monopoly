@@ -125,3 +125,6 @@ class Game():
         add_actions updates the appropriate flags based on which square a player landed on
         """
         pass
+    
+    def pay_rent(self):
+        pass
