@@ -98,3 +98,30 @@ class Game():
         """
         player.money += 200 * ((player.position + squares) // len(self.squares))
         player.position = (player.position + squares) % len(self.squares)
+    
+    def roll_move(self):
+        """
+        roll dice and move a player, updating rolls and doubles. Send player to jail at 3 doubles
+        """
+        roll = self.roll()
+        self.rolled += 1
+        if roll[0] == roll[1]:
+            self.doubles += 1
+        if self.doubles >= 3:
+            self.send_to_jail(self.active_player)
+        else:
+            self.move_player(self.active_player, roll[0]+roll[1])
+            self.add_actions()
+    
+    def send_to_jail(self, player:Player):
+        """
+        send_to_jail sends a given player to jail, setting their position and jailtime
+        accordingly
+        """
+        pass
+
+    def add_actions(self):
+        """
+        add_actions updates the appropriate flags based on which square a player landed on
+        """
+        pass
