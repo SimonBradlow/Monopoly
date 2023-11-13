@@ -25,6 +25,18 @@ class Game():
         self.rent_owed = 0
         self.active_player = self.players[self.turns % len(self.players)]
     
+    def active_square(self):
+        """
+        active_square returns the square that the active player is on
+        """
+        return self.squares[self.active_player.position]
+    
+    def active_property(self):
+        """
+        active_property returns the property belonging to the square the active player is on
+        """
+        return self.active_square().property
+
     def roll(self, dice=[6, 6]):
         """
         roll takes a list of integers representing the number of sides on the dice to roll,
@@ -111,20 +123,69 @@ class Game():
             self.send_to_jail(self.active_player)
         else:
             self.move_player(self.active_player, roll[0]+roll[1])
-            self.add_actions()
+            self.add_actions(roll)
     
     def send_to_jail(self, player:Player):
         """
         send_to_jail sends a given player to jail, setting their position and jailtime
         accordingly
         """
-        pass
+        player.position = 10
+        player.jailtime = 1
 
-    def add_actions(self):
+    def add_actions(self, dice: list[int]):
         """
         add_actions updates the appropriate flags based on which square a player landed on
         """
-        pass
+        if self.active_player.jailtime > 0:
+            # Actions if the player is in jail
+            pass
+        else:
+            # Actions if the player is not in jail
+            if self.active_property().group == "Tax":
+                self.taxes_to_pay = True
+            elif self.active_property().group in ["Chance", "Chest"]:
+                self.card_to_draw = True
+            elif self.active_property().group not in ["Go", "Jail", "Parking", "GoToJail"]:
+                if self.owners(self.active_property()) != self.active_player:
+                    self.rent_owed = self.calculate_rent(self.active_property(), sum(dice))
+                    if self.rent_owed > 0:
+                        self.rent_to_pay = True
     
     def pay_rent(self):
-        pass
+        """
+        pay_rent removes money from the active player equal to the rent owed,
+        and adds it to the player owning the property they are on
+        """
+        self.active_player.money -= self.rent_owed
+        self.owners[self.active_property()].money += self.rent_owed
+        self.rent_owed = 0
+        self.rent_to_pay = False
+
+    def legal_actions(self):
+        """
+        legal_actions returns a list of actions that the active player can take
+        actions are: roll_move, roll_jail, pay_fine, pay_rent, draw_card, pay_tax, end_turn
+        """
+        actions = []
+        if self.active_player.jailtime > 0:
+            # Active player is in jail
+            if self.rolled == 0:
+                # If they haven't rolled yet, they can either roll or pay the fine
+                actions += ["roll_jail", "pay_fine"]
+            else:
+                actions += ["end_turn"]
+        else:
+            # Active player is not in jail
+            if self.rent_to_pay:
+                actions += ["pay_rent"]
+            elif self.card_to_draw:
+                actions += ["draw_card"]
+            elif self.taxes_to_pay:
+                actions += ["pay_tax"]
+            else:
+                if self.rolled <= self.doubles:
+                    actions += ["roll_move"]
+                else:
+                    actions += ["end_turn"]
+        
