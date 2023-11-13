@@ -57,6 +57,9 @@ class Game():
         """
         end_turn resets the turn based actions and increments the turn counter
         """
+        if self.active_player.jailtime > 0:
+            # If they player is in jail, increment how long they have been there
+            self.active_player.jailtime += 1
         self.turns += 1
         self.doubles = 0
         self.rolled = 0
@@ -125,6 +128,30 @@ class Game():
             self.move_player(self.active_player, roll[0]+roll[1])
             self.add_actions(roll)
     
+    def roll_jail(self):
+        """
+        roll_jail handles the player rolling dice to get out of jail
+        """
+        roll = self.roll()
+        self.rolled += 1
+        if roll[0] == roll[1]:
+            # If the player rolls doubles, they get out of jail and move that far
+            self.active_player.jailtime = 0
+            self.move_player(self.active_player, sum(roll))
+            self.add_actions(roll)
+        elif self.active_player.jailtime > 3:
+            # If the player has been in jail for 3 turns and doesn't roll doubles, they must pay the fine and move the amount they rolled
+            self.pay_fine()
+            self.move_player(self.active_player, sum(roll))
+            self.add_actions(roll)
+    
+    def pay_fine(self):
+        """
+        pay_fine handles a player paying their fine from jail
+        """
+        self.active_player.money -= 50
+        self.active_player.jailtime = 0
+    
     def send_to_jail(self, player:Player):
         """
         send_to_jail sends a given player to jail, setting their position and jailtime
@@ -161,6 +188,24 @@ class Game():
         self.owners[self.active_property()].money += self.rent_owed
         self.rent_owed = 0
         self.rent_to_pay = False
+    
+    def pay_tax(self):
+        """
+        pay_tax removes money from the active player equal to the amount of tax
+        owed, based on which tax square they are on
+        """
+        if self.active_property().name == "Income Tax":
+            self.active_player.money -= 200
+        elif self.active_property().name == "Luxury Tax":
+            self.active_player.money -= 100
+        self.taxes_to_pay = False
+    
+    def draw_card(self):
+        """
+        draw_card is a dummy function to remove the card_to_draw flag, does not
+        function currently
+        """
+        self.card_to_draw = False
 
     def legal_actions(self):
         """
