@@ -28,9 +28,16 @@ class StartView(arcade.View):
 
     def on_draw(self):
         self.clear()
-        arcade.draw_text("Welcome to Monopoly!", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2 + 100,
-                         arcade.color.WHITE_SMOKE, font_size=40, anchor_x="center")
-        arcade.draw_text("Choose your piece", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2,
+        arcade.draw_text("Welcome to", self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2 + 200,
+                         arcade.color.WHITE, font_size=50, anchor_x="center")
+        # draw logo
+        logo = arcade.load_texture("assets/logo.png")
+        logo_scale = self.SCREEN_WIDTH / 800
+        logo_tilt_angle = 0
+        arcade.draw_scaled_texture_rectangle(self.SCREEN_WIDTH / 2,
+                                             self.SCREEN_HEIGHT / 2 + 100,
+                                             logo, logo_scale, logo_tilt_angle)
+        arcade.draw_text("Please Choose your piece", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2 - 25,
                          arcade.color.GRAY, font_size=20, anchor_x="center")
 
         self.manager.draw()

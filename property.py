@@ -17,6 +17,9 @@ class Property():
         self.mortgaged = mortgaged
         self.building_count = building_count
 
+        self.sprite_list = arcade.SpriteList()
+        self.tile_sprite = arcade.Sprite()
+
         self.render = False
         self.width = 0
         self.height = 0
@@ -109,11 +112,107 @@ class Property():
             )
             self.group_text.scale = (self.height/4)/145
 
+        else:
+
+            self.width = 200
+            self.height = self.width * 1.125
+            self.edge = self.width * 0.075
+
+            # Initialize non-street sprites
+            scaling = (self.height - 1) / 400
+
+            # Create background and border
+            background = arcade.create_rectangle_filled(0, 0, self.width, self.height, arcade.color.WHITE)
+            border = arcade.create_rectangle_outline(0, 0, self.width - self.edge, self.height - self.edge,
+                                                     arcade.color.BLACK, 1)
+            # Append to shape list
+            self.shape_list = arcade.ShapeElementList()
+            self.shape_list.append(background)
+            self.shape_list.append(border)
+            self.fixed_name = self.name.lower().replace(" ", "")
+
+            # Initialize railroad sprites
+            if self.group == "Railroad":
+                self.tile_sprite = arcade.Sprite("assets/train.png", scaling)
+                self.tile_sprite.center_x = 0
+                self.tile_sprite.center_y = 0
+                self.sprite_list.append(self.tile_sprite)
+
+                # Railroad text
+                split_text = self.name.upper()
+                split_text = split_text + "         "
+                unsplit_text = split_text.replace(" ", "\n")
+                self.nameText = arcade.create_text_sprite(
+                    unsplit_text,
+                    0,
+                    0,
+                    arcade.color.BLACK,
+                    20,
+                    font_name="assets/KabelMediumRegular.ttf",
+                    align="center",
+                    anchor_x="center",
+                    anchor_y="center",
+                )
+                self.nameText.scale = self.width / 260
+
+            # Initialize water works and electric company sprites
+            elif self.group == "Utility":
+                if self.name == "Water Works":
+                    self.tile_sprite = arcade.Sprite("assets/spigot.png", scaling)
+                else:
+                    self.tile_sprite = arcade.Sprite("assets/lightbulb.png", scaling)
+                self.tile_sprite.center_x = 0
+                self.tile_sprite.center_y = 0
+                self.sprite_list.append(self.tile_sprite)
+
+                # utility name
+                split_text = self.name.upper()
+                split_text = split_text + "         "
+                unsplit_text = split_text.replace(" ", "\n")
+                self.nameText = arcade.create_text_sprite(
+                    unsplit_text,
+                    0,
+                    0,
+                    arcade.color.BLACK,
+                    20,
+                    font_name="assets/KabelMediumRegular.ttf",
+                    align="center",
+                    anchor_x="center",
+                    anchor_y="center",
+                )
+                self.nameText.scale = self.width / 260
+
+            # Draw price and rent for non-street sprites
+            price_string = "PRICE $" + str(self.price) + "\n"
+            rent_string = "RENT $" + str(self.rents) + "\n"
+            rent_string = rent_string.replace("[", "")
+            rent_string = rent_string.replace("]", "")
+            group_string = price_string
+            group_string += rent_string
+            self.group_text = arcade.create_text_sprite(
+                group_string,
+                0,
+                0,
+                arcade.color.BLACK,
+                30,
+                font_name="assets/KabelMediumRegular.ttf",
+                align="center",
+                anchor_x="center",
+                anchor_y="center",
+            )
+            self.group_text.scale = (self.height / 4) / 145
+
     def draw(self, x, y):
+
+        # Set position of the tile
+        self.shape_list.center_x = x
+        self.shape_list.center_y = y
+
+        # Set position of group text
+        self.group_text.center_x = x
+        self.group_text.center_y = y - (((self.height - self.edge * 2) / 20) * 9)
+
         if self.group in self.color_names:
-            # Set position and rotation of tile
-            self.shape_list.center_x = x
-            self.shape_list.center_y = y
 
             # Draw the shape_list
             self.shape_list.draw()
@@ -130,9 +229,25 @@ class Property():
             self.rent_text.center_y = y-(((self.height-self.edge*2)/40)*3)
             self.rent_text.draw()
 
-            self.group_text.center_x = x
-            self.group_text.center_y = y-(((self.height-self.edge*2)/20)*9)
-            self.group_text.draw()
+        elif self.group == "Railroad" or self.group == "Utility":
 
-        else:
-            pass
+            # Set position of sprites
+            self.sprite_list.center_x = x
+            self.sprite_list.center_y = y
+            self.tile_sprite.center_x = x
+            self.tile_sprite.center_y = y
+
+            # Draw the sprite_list, shape list and tile sprite
+            self.shape_list.draw()
+            self.sprite_list.draw()
+            self.tile_sprite.draw()
+
+            # Draw name and group text
+            if self.group == "Railroad" or self.group == "Utility":
+                self.nameText.center_x = x
+                self.nameText.center_y = y - 25
+                self.nameText.draw()
+                self.group_text.draw()
+
+
+
