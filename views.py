@@ -7,6 +7,7 @@ import board
 from player import Player
 from board import Board
 import custom_gui
+import random
 
 # START SCREEN VIEW
 class StartView(arcade.View):
@@ -19,7 +20,7 @@ class StartView(arcade.View):
         self.EDGE_SPACE = e
         self.player_piece = 0
 
-        # Create UI manager
+# Create UI manager
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
         self.update_buttons()
@@ -47,26 +48,36 @@ class StartView(arcade.View):
 
     def update_buttons(self):
         self.manager.clear()
+        width = self.SCREEN_WIDTH/8
+        height = self.SCREEN_HEIGHT/8
 
         #create buttons for piece selection
-        self.carPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="car", image=Image.open('assets/car.png')), width=150, height=150,
-                                           x=self.SCREEN_WIDTH/3 - 75, y=self.SCREEN_HEIGHT/4 - 25)
-        self.dogPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="dog", image=Image.open('assets/dog.png')), width=100, height=100,
-                                           x=self.SCREEN_WIDTH/3 + 150, y=self.SCREEN_HEIGHT/4)
-        self.hatPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="hat", image=Image.open('assets/hat.png')), width=100, height=100,
-                                           x=self.SCREEN_WIDTH/3 - 50, y=self.SCREEN_HEIGHT/4 - 150)
-        self.shipPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="ship", image=Image.open('assets/ship.png')), width=200,
-                                                    height=200, x=self.SCREEN_WIDTH/3 + 100, y=self.SCREEN_HEIGHT/4 - 185)
+        self.carPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="car", image=Image.open('assets/car.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)-(width/2)), y=(((self.SCREEN_HEIGHT/8)*3)-50))
+        self.dogPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="dog", image=Image.open('assets/dog.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)*3)-(width/2), y=(((self.SCREEN_HEIGHT/8)*3)-(height/2)))
+        self.hatPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="hat", image=Image.open('assets/hat.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)*5)-(width/2), y=(((self.SCREEN_HEIGHT/8)*3)-(height/2)))
+        self.shipPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="ship", image=Image.open('assets/ship.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)*7)-(width/2), y=((self.SCREEN_HEIGHT/8)*3)-(height/2))
+        self.bootPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="boot", image=Image.open('assets/boot.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)-(width/2)), y=((self.SCREEN_HEIGHT/8)-(height/2)))
+        self.ironPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="iron", image=Image.open('assets/iron.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)*3)-(width/2), y=((self.SCREEN_HEIGHT/8)-(height/2)))
+        self.thimblePiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="thimble", image=Image.open('assets/thimble.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)*5)-(width/2), y=((self.SCREEN_HEIGHT/8)-(height/2)))
+        self.wheelbarrowPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="wheelbarrow", image=Image.open('assets/wheelbarrow.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)*7)-(width/2), y=((self.SCREEN_HEIGHT/8)-(height/2)))
 
         self.manager.add(self.carPiece)
         self.manager.add(self.dogPiece)
         self.manager.add(self.hatPiece)
         self.manager.add(self.shipPiece)
+        self.manager.add(self.bootPiece)
+        self.manager.add(self.ironPiece)
+        self.manager.add(self.thimblePiece)
+        self.manager.add(self.wheelbarrowPiece)
 
         self.carPiece.on_click = self.on_click_car
         self.dogPiece.on_click = self.on_click_dog
         self.hatPiece.on_click = self.on_click_hat
         self.shipPiece.on_click = self.on_click_ship
+        self.bootPiece.on_click = self.on_click_boot
+        self.ironPiece.on_click = self.on_click_iron
+        self.thimblePiece.on_click = self.on_click_thimble
+        self.wheelbarrowPiece.on_click = self.on_click_wheelbarrow
 
     def on_click_car(self, event):
         self.player_piece = 0
@@ -80,6 +91,19 @@ class StartView(arcade.View):
     def on_click_ship(self, event):
         self.player_piece = 3
         self.render_board()
+    def on_click_boot(self, event):
+        self.player_piece = 4
+        self.render_board()
+    def on_click_iron(self, event):
+        self.player_piece = 5
+        self.render_board()
+    def on_click_thimble(self, event):
+        self.player_piece = 6
+        self.render_board()
+    def on_click_wheelbarrow(self, event):
+        self.player_piece = 7
+        self.render_board()
+
     def render_board(self):
         game_view = GameView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE, self.player_piece)
         game_view.setup()
@@ -206,6 +230,8 @@ class GameView(arcade.View):
         # and set them to None
         self.board = Board(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
         self.mouse_sprite = arcade.SpriteSolidColor(1, 1, (0,0,0,0))
+        self.die_sprites = arcade.SpriteList()
+
 
         # Game information to track
         self.board.players = [Player(0, self.player_piece, self.board.tile_width)]
@@ -251,6 +277,7 @@ class GameView(arcade.View):
 
         # Call draw() on all your sprite lists below
         self.board.draw()
+        self.die_sprites.draw()
         for s in self.board.squares:
             if s.property.render == True:
                 if self.mouse_sprite.center_x < self.SCREEN_WIDTH/2:
@@ -336,6 +363,30 @@ class GameView(arcade.View):
 
     def on_roll_dice(self, event):
         roll = self.board.roll()
+
+        # DICE RENDER FUNCTIONALITY
+        self.die_sprites.clear()
+        die_list = []
+        i = 0
+        while i < 2:
+            scaling = (self.board.tile_width/1.5)/350
+            png_name = "assets/die" + str(roll[i]) + ".png"
+            die_sprite = arcade.Sprite(png_name, scaling)
+            rand_x = random.randint((self.board.tile_width*3)*(-1), self.board.tile_width*3)
+            rand_y = random.randint((self.board.tile_width*3)*(-1), self.board.tile_width*3)
+            die_sprite.center_x = self.SCREEN_WIDTH/2 + rand_x
+            die_sprite.center_y = self.SCREEN_WIDTH/2 + rand_y
+            die_sprite.angle = random.randint(0, 90)
+            die_list.append(die_sprite)
+            # Check for overlapping dice and restart if so
+            if (i == 1) and (arcade.check_for_collision(die_list[0], die_list[1])):
+                die_list.clear()
+                i = 0
+            else:
+                i += 1
+        for s in die_list:
+            self.die_sprites.append(s)
+
         self.rolled += 1
         if roll[0] == roll[1]:
             self.doubles +=1
