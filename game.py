@@ -36,6 +36,16 @@ class Game():
         active_property returns the property belonging to the square the active player is on
         """
         return self.active_square().property
+    
+    def square_action(self, square: Square):
+        if square.property.group == "Tax":
+            return "pay_tax"
+        elif square.property.group in ["Chance", "Chest"]:
+            return "draw_card"
+        elif square.property.group not in ["Go", "Jail", "Parking", "GoToJail"]:
+            return "property_action"
+        else:
+            return "no_action"
 
     def roll(self, dice=[6, 6]):
         """
@@ -210,27 +220,38 @@ class Game():
     def legal_actions(self):
         """
         legal_actions returns a list of actions that the active player can take
-        actions are: roll_move, roll_jail, pay_fine, pay_rent, draw_card, pay_tax, end_turn
+        actions are: roll_move, roll_jail, pay_fine, pay_rent, draw_card, pay_tax, end_turn, buy_property, own_property
         """
-        actions = []
+        required_actions = []
+        other_actions = []
+        stubs = []
         if self.active_player.jailtime > 0:
             # Active player is in jail
             if self.rolled == 0:
                 # If they haven't rolled yet, they can either roll or pay the fine
-                actions += ["roll_jail", "pay_fine"]
+                required_actions += ["roll_jail", "pay_fine"]
             else:
-                actions += ["end_turn"]
+                required_actions += ["end_turn", "rolled_jail"]
         else:
             # Active player is not in jail
+            if self.rolled <= self.doubles:
+                roll_end = "roll_move"
             if self.rent_to_pay:
-                actions += ["pay_rent"]
+                required_actions += ["pay_rent"]
             elif self.card_to_draw:
-                actions += ["draw_card"]
+                required_actions += ["draw_card"]
             elif self.taxes_to_pay:
-                actions += ["pay_tax"]
+                required_actions += ["pay_tax"]
+            elif self.square_action(self.active_square()) != "property_action":
+                stubs += [self.square_action(self.active_square())]
             else:
-                if self.rolled <= self.doubles:
-                    actions += ["roll_move"]
+                if self.owners(self.active_square()) == self.active_player():
+                    other_actions += ["own_property"]
                 else:
-                    actions += ["end_turn"]
-        
+                    stubs += ["buy_property"]
+            if len(required_actions) > 0:
+                stubs += [roll_end]
+            else:
+                required_actions += [roll_end]
+            return required_actions, other_actions, stubs
+            
