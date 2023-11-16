@@ -288,6 +288,29 @@ class GameView(arcade.View):
                         s.property.draw(self.mouse_sprite.center_x-s.property.width/2, 
                                         self.mouse_sprite.center_y-s.property.height/2)
 
+        # Player funds text interface
+        fund_list = arcade.SpriteList()
+        width = 0
+        for i in range(len(self.board.players)):
+            num = str(self.board.players[i].player_no+1)
+            funds = str(self.board.players[i].money)
+            fund_string = "p" + num + "\n$" + funds
+
+            fund_sprite = arcade.create_text_sprite(
+                fund_string, 
+                16+(i*(width+16)), 
+                self.SCREEN_HEIGHT, 
+                arcade.color.BLACK, 
+                16,
+                font_name = "assets/KabelMediumRegular.ttf",
+                align="center",
+                anchor_x="left", 
+                anchor_y="top",
+            )
+            width = fund_sprite.width
+            fund_list.append(fund_sprite)
+        fund_list.draw()
+
         if type(self.active_player) is Player:
             self.manager.draw()
 
