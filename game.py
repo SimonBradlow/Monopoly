@@ -137,6 +137,7 @@ class Game():
         else:
             self.move_player(self.active_player, roll[0]+roll[1])
             self.add_actions(roll)
+        return roll
     
     def roll_jail(self):
         """
@@ -184,7 +185,7 @@ class Game():
             elif self.active_property().group in ["Chance", "Chest"]:
                 self.card_to_draw = True
             elif self.active_property().group not in ["Go", "Jail", "Parking", "GoToJail"]:
-                if self.owners(self.active_property()) != self.active_player:
+                if self.owners[self.active_property()] != self.active_player:
                     self.rent_owed = self.calculate_rent(self.active_property(), sum(dice))
                     if self.rent_owed > 0:
                         self.rent_to_pay = True
@@ -236,6 +237,8 @@ class Game():
             # Active player is not in jail
             if self.rolled <= self.doubles:
                 roll_end = "roll_move"
+            else:
+                roll_end = "end_turn"
             if self.rent_to_pay:
                 required_actions += ["pay_rent"]
             elif self.card_to_draw:
@@ -245,10 +248,10 @@ class Game():
             elif self.square_action(self.active_square()) != "property_action":
                 stubs += [self.square_action(self.active_square())]
             else:
-                if self.owners(self.active_square()) == self.active_player():
-                    other_actions += ["own_property"]
+                if self.owners[self.active_property()] == self.active_player:
+                    stubs += ["own_property"]
                 else:
-                    stubs += ["buy_property"]
+                    other_actions += ["buy_property"]
             if len(required_actions) > 0:
                 stubs += [roll_end]
             else:
