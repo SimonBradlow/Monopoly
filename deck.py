@@ -6,7 +6,7 @@ class Deck():
     """
     Class representing a deck of cards in Monopoly.
     """
-    def __init__(self, deck_type: str, cards: list = []):
+    def __init__(self, deck_type: str, cards: list = [], scale):
         self.deck_type = deck_type
         self.cards = cards
 
@@ -22,7 +22,7 @@ class Deck():
                     desc = line['description']
                     category = line['category']
                     effect = line['effect']
-                    new_card = Card(card_type, name, desc, category, effect)
+                    new_card = Card(card_type, name, desc, category, effect, scale)
                     cards.append(new_card)
 
     def get_cards(self):

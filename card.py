@@ -1,13 +1,22 @@
+import arcade
+
 class Card():
     """
     Class representing an individual card.
     """
-    def __init__(self, card_type: str = "", name: str = "", desc: str = "", category: str = "", effect: int = 0):
+    def __init__(self, card_type: str = "", name: str = "", desc: str = "", category: str = "", effect: int = 0, scale):
         self.card_type = card_type
         self.name = name
         self.desc = desc
         self.category = category
         self.effect = effect
+
+        # Global constants used for drawing cards
+        self.sprite_list = arcade.SpriteList()
+        background = arcade.SpriteSolidColor(scale/2, scale/4, (255, 95, 0))
+        background.center_x = scale/2
+        background.center_y = scale/2
+        self.sprite_list.append(background)
 
     def get_name(self):
         return self.name
@@ -74,3 +83,6 @@ class Card():
             return (category, int(position))
         else:
             return (category, 1)
+
+    def draw(self):
+        self.sprite_list.draw()
