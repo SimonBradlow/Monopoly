@@ -20,7 +20,7 @@ class StartView(arcade.View):
         self.EDGE_SPACE = e
         self.player_piece = 0
 
-# Create UI manager
+        # Create UI manager
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
         self.update_buttons()
@@ -29,10 +29,17 @@ class StartView(arcade.View):
 
     def on_draw(self):
         self.clear()
-        arcade.draw_text("Welcome to Monopoly!", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2 + 100,
-                         arcade.color.WHITE_SMOKE, font_size=40, anchor_x="center")
-        arcade.draw_text("Choose your piece", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2,
-                         arcade.color.GRAY, font_size=20, anchor_x="center")
+        arcade.draw_text("Welcome to", self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2 + 200,
+                         arcade.color.WHITE, font_size=50, anchor_x="center")
+        # draw logo
+        logo = arcade.load_texture("assets/logo.png")
+        logo_scale = self.SCREEN_WIDTH / 2500
+        logo_tilt_angle = 0
+        arcade.draw_scaled_texture_rectangle(self.SCREEN_WIDTH / 2,
+                                             self.SCREEN_HEIGHT / 2 + 100,
+                                             logo, logo_scale, logo_tilt_angle)
+        arcade.draw_text("Please Choose your piece", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2 - 25,
+                         arcade.color.WHITE_SMOKE, font_size=20, anchor_x="center")
 
         self.manager.draw()
 
@@ -117,17 +124,23 @@ class PropertyView(arcade.View):
         self.tile_width = 200
         self.tile_height = 225
 
-        self.mouse_sprite = arcade.SpriteSolidColor(1, 1, (0, 0, 0, 0))
-
-        #margins for scrolling through properties
-        self.top_viewport_margin = 20
-        self.bottom_viewport_margin = 20
-        self.view_bottom = 0
-        self.view_top = 0
-        self.changed = False
+        # variables needed for displaying properties and buying house
+        self.buy_house = arcade.gui.UIFlatButton()
+        self.left_arrow = arcade.gui.UITextureButton()
+        self.right_arrow = arcade.gui.UITextureButton()
+        self.button_width = 200
+        self.button_height = 50
+        self.active_property = 0
         self.card_x = 0
         self.card_y = 0
 
+        # identify color names for streets
+        self.color_names = ['Brown', 'LightBlue', 'Pink', 'Orange', 'Red', 'Yellow', 'Green', 'Blue']
+
+        # Create UI manager
+        self.manager = arcade.gui.UIManager()
+        self.manager.enable()
+        self.update_buttons()
 
     def on_show_view(self):
         arcade.set_background_color(arcade.color.AMAZON)
@@ -136,68 +149,75 @@ class PropertyView(arcade.View):
         self.clear()
 
         # set where a card is initially rendered in the property view
-        self.card_x = self.tile_width/2
-        self.card_y = self.SCREEN_HEIGHT-115
+        self.card_x = self.SCREEN_WIDTH / 2
+        self.card_y = self.SCREEN_HEIGHT / 2
 
-        # Placing cards on the screen, currently hard coded but
-        # should be made more dynamic to fit varying window sizes eventually
-        for i in range(0, len(self.player.properties)):
-            # For the first 5 cards, put it in one column.
-            if i <= 4:
-                self.player.properties[i].draw(self.card_x, self.card_y)
-            # Next 4(?) cards go in the next column.
-            elif i > 4 and i <= 8:
-                self.card_x += 200
-                self.card_y = self.SCREEN_HEIGHT-115
-                self.player.properties[i].draw(self.card_x, self.card_y)
-            else:
-                self.card_x += 200
-                self.card_y = self.SCREEN_HEIGHT-115
-                self.player.properties[i].draw(self.card_x, self.card_y)
-            self.card_y -= 225
+        # Draw first property the player holds
+        self.player.properties[self.active_property].draw(self.card_x, self.card_y)
+
+        self.manager.draw()
+
     def on_key_press(self, symbol: int, modifiers: int):
         # if player presses esc button the view returns to board.
         if symbol == 65307:
-            # resetting view so board is rendered back in the center of the screen.
-            arcade.set_viewport(self.view_top,
-                                self.SCREEN_HEIGHT + self.view_top,
-                                0,
-                                self.SCREEN_HEIGHT)
+
             self.window.show_view(self.game_view)
 
-    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
+    def update_buttons(self):
+        self.manager.clear()
 
-        self.mouse_sprite.center_x = x
-        self.mouse_sprite.center_y = y
+        # draw buy house button
+        self.buy_house = arcade.gui.UIFlatButton(text="Buy house", width=self.button_width, height=self.button_height,
+                                                 x=self.SCREEN_WIDTH/2-(self.button_width/2), y=self.SCREEN_HEIGHT-(self.button_height*2))
 
-        # set boundary for window scrolling
-        self.top_boundary = self.view_bottom + self.SCREEN_HEIGHT - self.top_viewport_margin
-        self.bottom_boundary = self.view_bottom + self.SCREEN_HEIGHT - self.bottom_viewport_margin
+        self.right_arrow = arcade.gui.UITextureButton(
+            texture=arcade.Texture(name="right arrow", image=Image.open('assets/right_arrow.png')), width=self.SCREEN_WIDTH / 10,
+            height=self.SCREEN_HEIGHT / 10, x=self.SCREEN_WIDTH - (self.SCREEN_WIDTH/10),
+            y=self.SCREEN_HEIGHT/2)
 
-        # check if scroll up is needed
-        if self.mouse_sprite.center_y > self.top_boundary:
-            self.view_bottom += self.mouse_sprite.center_y - self.top_boundary
-            self.changed = True
+        self.left_arrow = arcade.gui.UITextureButton(
+            texture=arcade.Texture(name="left arrow", image=Image.open('assets/left_arrow.png')), width=self.SCREEN_WIDTH / 10,
+            height=self.SCREEN_HEIGHT / 10, x=(self.SCREEN_WIDTH/30),
+            y=self.SCREEN_HEIGHT/2)
 
-        # check if scroll down is needed
-        if self.mouse_sprite.center_y < self.bottom_boundary:
-            self.view_bottom -= self.bottom_boundary - self.mouse_sprite.center_y
-            self.changed = True
+        self.manager.add(self.buy_house)
+        self.manager.add(self.left_arrow)
+        self.manager.add(self.right_arrow)
 
-        # if scroll is needed
-        if self.changed:
-            #cast viewport to integers so it doesn't mess with pixels
-            self.view_bottom = int(self.view_bottom)
-            self.view_top = int(self.view_top)
+        self.buy_house.on_click = self.buy_property
+        self.left_arrow.on_click = self.scroll_left
+        self.right_arrow.on_click = self.scroll_right
 
-            # actually do the scroll
-            arcade.set_viewport(self.view_top,
-                                self.SCREEN_HEIGHT + self.view_top,
-                                self.view_bottom,
-                                self.SCREEN_HEIGHT + self.view_bottom)
+    def buy_property(self, event):
 
+        # if type of property is a street
+        if self.player.properties[self.active_property].group in self.color_names:
+            # no more than four houses allowed on a property
+            if self.player.properties[self.active_property].building_count <= 3:
+                self.player.properties[self.active_property].building_count += 1
 
+    def on_update(self, delta_time: float):
 
+        # Draw first property the player holds
+        self.player.properties[self.active_property].draw(self.card_x, self.card_y)
+
+    def scroll_left(self, event):
+
+        # if looking at property that isn't first in list
+        if self.active_property > 0:
+            # look at previous property
+            self.active_property -= 1
+        else:
+            pass
+
+    def scroll_right(self, event):
+
+        # if property isn't last in list
+        if self.active_property < len(self.player.properties)-1:
+            # look at next property
+            self.active_property += 1
+        else:
+            pass
 
 
 class GameView(arcade.View):
