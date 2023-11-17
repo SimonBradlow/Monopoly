@@ -4,7 +4,7 @@ class Property():
     """
     Class representing properties in Monopoly
     """
-    def __init__(self, name: str, group:str, price: int, rents: list, building_cost: int, mortgage_value: int, mortgaged: bool = False, building_count: int = 0):
+    def __init__(self, name: str, group:str, price: int, rents: list, building_cost: int, mortgage_value: int, iscale: int = 200, mortgaged: bool = False, building_count: int = 0):
         """
         Initializer for Property class
         """
@@ -25,7 +25,7 @@ class Property():
         self.height = 0
         self.color_names = ['Brown', 'LightBlue', 'Pink', 'Orange', 'Red', 'Yellow', 'Green', 'Blue']
         if self.group in self.color_names:      
-            self.width = 200
+            self.width = iscale
             self.height = self.width*1.125
             self.edge = self.width*0.075
             self.rgb_values = [(134, 76, 56), (172, 220, 242), (197, 56, 132), (236, 139, 44), (219, 36, 40), (255, 239, 3), (19, 168, 87), (0, 102, 164)]
@@ -114,7 +114,7 @@ class Property():
 
         else:
 
-            self.width = 200
+            self.width = iscale
             self.height = self.width * 1.125
             self.edge = self.width * 0.075
 
@@ -229,6 +229,10 @@ class Property():
             self.rent_text.center_y = y-(((self.height-self.edge*2)/40)*3)
             self.rent_text.draw()
 
+            self.group_text.center_x = x
+            self.group_text.center_y = y-(((self.height-self.edge*2)/20)*9)
+            self.group_text.draw()
+
         elif self.group == "Railroad" or self.group == "Utility":
 
             # Set position of sprites
@@ -243,11 +247,7 @@ class Property():
             self.tile_sprite.draw()
 
             # Draw name and group text
-            if self.group == "Railroad" or self.group == "Utility":
-                self.nameText.center_x = x
-                self.nameText.center_y = y - 25
-                self.nameText.draw()
-                self.group_text.draw()
-
-
-
+            self.nameText.center_x = x
+            self.nameText.center_y = y - (25*(self.width/200))
+            self.nameText.draw()
+            self.group_text.draw()
