@@ -9,21 +9,6 @@ class Card():
         self.category = category
         self.effect = effect
 
-    def get_name(self):
-        return self.name
-
-    def get_card_type(self):
-        return self.card_type
-
-    def get_desc(self):
-        return self.desc
-
-    def get_category(self):
-        return self.category
-
-    def get_effect(self):
-        return self.effect
-
     def calculate_position(self, position):
         # Determine where player needs to move, calculate how far they need to
         # move from their current position
@@ -67,10 +52,16 @@ class Card():
 
     def return_effect(self, position):
         category = self.category
-        if category == "money" or category == "money_players" or category == "money_houses":
+        if category == "money" or category == "money_players":
             return (category, int(self.effect))
+        elif category == "money_houses":
+            if self.card_type == "Chance":
+                return (category, -25, -100)
+            else:
+                return (category, -40, -115)
         elif category == "move" or category == "move_jail" or category == "move_utility" or category == "move_rr" or category == "move_abs":
             position = self.calculate_position(position)
             return (category, int(position))
         else:
             return (category, 1)
+

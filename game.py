@@ -2,6 +2,7 @@ from player import Player
 from property import Property
 from board import Board
 from square import Square
+from deck import Deck
 from collections import defaultdict
 import random
 
@@ -24,6 +25,8 @@ class Game():
         self.rent_to_pay = False
         self.rent_owed = 0
         self.active_player = self.players[self.turns % len(self.players)]
+        self.chance = Deck("Chance")
+        self.chest = Deck("Chest")
     
     def active_square(self):
         """
@@ -213,9 +216,38 @@ class Game():
     
     def draw_card(self):
         """
-        draw_card is a dummy function to remove the card_to_draw flag, does not
-        function currently
+        draw_card draws a card from the appropriate deck and performs the card's
+        action on the player
         """
+        # Draw the card
+        if self.active_property().name == "Chance":
+            card = self.chance.draw_card()
+        else:
+            card = self.chest.draw_card()
+
+        # Implement card's effect on the player
+        effect = card.return_effect(self.active_player.position)
+        if effect[0] == "money":
+            self.active_player.money += effect[1]
+        elif effect[0] == "money_players":
+            self.active_player.money += (len(players) - 1) * effect[1]
+            for player in range(len(players)):
+                if Players[p].player_no != self.active_player.player_no:
+                    Players[p].money += -effect[1]
+        elif effect[0] == "money_houses":
+            for property in self.active_player.properties:
+                if property.building_count == 5:
+                    self.active_player.money += 4 * effect[1]
+                    self.active_player.money += effect[2]
+                else:
+                    self.active_player.money += property.building_count * effect[1]
+        elif effect[0] == "move_jail":
+            send_to_jail(self.active_player)
+        elif effect[0] == "move" or effect[0] == "move_utility" or effect[0] == "move_rr" or effect[0] == "move_abs":
+            self.active_player.position = effect[1]
+        else:
+            self.active_player.jail_free = True
+        
         self.card_to_draw = False
 
     def legal_actions(self):
