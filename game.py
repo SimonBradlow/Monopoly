@@ -17,6 +17,9 @@ class Game():
         self.group_counts = defaultdict(int)
         for prop in owners.keys():
             self.group_counts[prop] += 1
+        # Track how many houses/hotels the bank has left
+        self.bank_houses = 32
+        self.bank_hotels = 12
         self.turns = 0
         self.doubles = 0
         self.rolled = 0
@@ -118,6 +121,40 @@ class Game():
         self.owners[property] = player
         player.properties.append(property)
         return True
+    
+    def can_buy_house(self, property: Property, player: Player):
+        """
+        can_buy_house checks if the given player can buy a house on the given property
+        returns True if they can, False if not
+        """
+        # Make sure the player has a monopoly
+        monopoly = self.group_counts[property.group] == player.get_group_counts()[property.group]
+        if monopoly:
+            # Check the minimum number of houses on each property in the group
+            min_building_count = 5
+            for prop in self.owners.keys():
+                if prop.group == property.group and prop.building_count < min_building_count:
+                    min_building_count = prop.building_count
+            # If the property does not have a hotel, and is among the least developed properties in the group,
+            # and the bank has a house or hotel, return True
+            if property.building_count < 5 and property.building_count == min_building_count:
+                if property.building_count < 4:
+                    return self.bank_houses > 0
+                elif property.building_count == 4:
+                    return self.bank_hotels > 0
+        # Otherwise, return False
+        return False
+    
+    def can_sell_house(self, property: Property):
+        """
+        can_sell_house checks if the given player can sell a house on the given property
+        returns True if they can, False if not
+        """
+        max_building_count = 0
+        for prop in self.owners.keys():
+            if prop.group == property.group and prop.building_count > max_building_count:
+                max_building_count = prop.building_count
+        return (property.building_count == max_building_count and property.building_count > 0)
     
     def move_player(self, player: Player, squares: int):
         """
