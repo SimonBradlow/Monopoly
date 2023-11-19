@@ -253,7 +253,7 @@ class Game():
     def legal_actions(self):
         """
         legal_actions returns a list of actions that the active player can take
-        actions are: roll_move, roll_jail, pay_fine, pay_rent, draw_card, pay_tax, end_turn, buy_property, own_property
+        actions are: roll_move, roll_jail, rolled_jail, pay_fine, pay_rent, draw_card, pay_tax, end_turn, buy_property, own_property
         """
         required_actions = []
         other_actions = []
@@ -278,11 +278,12 @@ class Game():
             elif self.taxes_to_pay:
                 required_actions += ["pay_tax"]
             elif self.square_action(self.active_square()) != "property_action":
-                stubs += [self.square_action(self.active_square())]
+                if self.rolled > 0:
+                    stubs += [self.square_action(self.active_square())]
             else:
                 if self.owners[self.active_property()] == self.active_player:
                     stubs += ["own_property"]
-                else:
+                elif self.rolled > 0:
                     other_actions += ["buy_property"]
             if len(required_actions) > 0:
                 stubs += [roll_end]
