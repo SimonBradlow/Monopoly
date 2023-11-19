@@ -156,6 +156,40 @@ class Game():
                 max_building_count = prop.building_count
         return (property.building_count == max_building_count and property.building_count > 0)
     
+    def buy_house(self, property: Property, player: Player):
+        """
+        buy_house has the given player buy a house on the given property
+        returns True if successful, False if not
+        """
+        # If the player cannot buy a house/hotel on the property, return False
+        if not self.can_buy_house(property, player) or player.money < property.building_cost:
+            return False
+        # Otherwise, update the information around buying the house/hotel and return True
+        if property.building_count == 4:
+            self.bank_houses += 4
+            self.bank_hotels -= 1
+        else:
+            self.bank_houses -= 1
+        property.building_count += 1
+        player.money -= property.building_cost
+        return True
+    
+    def sell_house(self, property: Property, player: Player):
+        """
+        sell_house has the given player sell a hosue on the given property
+        returns True if successful, False if not
+        """
+        if not self.can_sell_house(property):
+            return False
+        if property.building_count == 5:
+            self.bank_houses -= 4
+            self.bank_hotels += 1
+        else:
+            self.bank_houses += 1
+        property.building_count -= 1
+        player.money += property.building_cost // 2
+        return True
+    
     def move_player(self, player: Player, squares: int):
         """
         Move a player a given number of squares
