@@ -398,6 +398,7 @@ class GameView(arcade.View):
         self.update_buttons()
 
     def update_buttons(self):
+        unclickable_style = {"bg_color_pressed": arcade.color.BLACK, "border_color_pressed": arcade.color.BLACK, "font_color_pressed": arcade.color.WHITE}
         # Remove the old buttons
         self.manager.remove(self.left_layout)
         # Create the new container for the left buttons
@@ -418,49 +419,50 @@ class GameView(arcade.View):
             pay_action.on_click = self.on_end_turn
             self.left_layout.add(roll_action)
             self.left_layout.add(pay_action)
-        # Add action button (roll or end turn)
-        if "roll_move" in required_actions:
-            action = arcade.gui.UIFlatButton(text="Roll Dice", width=self.button_width, height=self.button_height)
-            action.on_click = self.on_roll_dice
-        elif "roll_move" in stubs:
-            action = custom_gui.BackgroundText(text="Roll Dice", height=self.button_height, width=self.button_width)
-        elif "end_turn" in required_actions:
-            action = arcade.gui.UIFlatButton(text="End Turn", width=self.button_width, height=self.button_height)
-            action.on_click = self.on_end_turn
-        elif "end_turn" in stubs:
-            action = custom_gui.BackgroundText(text="End Turn", width=self.button_width, height=self.button_height)
-        self.left_layout.add(action)
-        # Add square action (buy property, pay rent, draw card, pay taxes)
-        square = None
-        if "pay_tax" in required_actions:
-            # Pay taxes
-            square = arcade.gui.UIFlatButton(text="Pay Taxes", width=self.button_width, height=self.button_height)
-            square.on_click = self.on_pay_taxes
-        elif "pay_tax" in stubs:
-            square = custom_gui.BackgroundText(text="You have paid your tax!", width=self.button_width, height=self.button_height)
-        if "draw_card" in required_actions:
-            # Draw a card
-            square = arcade.gui.UIFlatButton(text="Draw a card", width=self.button_width, height=self.button_height)
-            square.on_click = self.on_draw_card
-        elif "draw_card" in stubs:
-            square = custom_gui.BackgroundText(text="You have drawn your card!", width=self.button_width, height=self.button_height)
-        if "own_property" in stubs or "buy_property" in other_actions:
-            property_name = self.game.active_property().name
-            if "buy_property" in other_actions:
-                # Buy the property
-                square = arcade.gui.UIFlatButton(text=f"Buy {property_name}", width=self.button_width, height=self.button_height)
-                square.on_click = self.on_buy_property
-            elif "own_property" in stubs:
-                # Grey out buy button
-                square = custom_gui.BackgroundText(text=f"You own {property_name}", width=self.button_width, height=self.button_height)
-        if "pay_rent" in required_actions:
-            # Pay rent
-            square = arcade.gui.UIFlatButton(text=f"Pay ${self.game.rent_owed} Rent", width=self.button_width, height=self.button_height)
-            square.on_click = self.on_pay_rent
-        elif "pay_rent" in stubs:
-            square = custom_gui.BackgroundText(text=f"No rent owed!", width=self.button_width, height=self.button_height)
-        if square is not None:
-            self.left_layout.add(square)
+        else:
+            # Add action button (roll or end turn)
+            if "roll_move" in required_actions:
+                action = arcade.gui.UIFlatButton(text="Roll Dice", width=self.button_width, height=self.button_height)
+                action.on_click = self.on_roll_dice
+            elif "roll_move" in stubs:
+                action = arcade.gui.UIFlatButton(text="Roll Dice", height=self.button_height, width=self.button_width, style=unclickable_style)
+            elif "end_turn" in required_actions:
+                action = arcade.gui.UIFlatButton(text="End Turn", width=self.button_width, height=self.button_height)
+                action.on_click = self.on_end_turn
+            elif "end_turn" in stubs:
+                action = arcade.gui.UIFlatButton(text="End Turn", width=self.button_width, height=self.button_height, style=unclickable_style)
+            self.left_layout.add(action)
+            # Add square action (buy property, pay rent, draw card, pay taxes)
+            square = None
+            if "pay_tax" in required_actions:
+                # Pay taxes
+                square = arcade.gui.UIFlatButton(text="Pay Taxes", width=self.button_width, height=self.button_height)
+                square.on_click = self.on_pay_taxes
+            elif "pay_tax" in stubs:
+                square = arcade.gui.UIFlatButton(text="You have paid your tax!", width=self.button_width, height=self.button_height, style=unclickable_style)
+            if "draw_card" in required_actions:
+                # Draw a card
+                square = arcade.gui.UIFlatButton(text="Draw a card", width=self.button_width, height=self.button_height)
+                square.on_click = self.on_draw_card
+            elif "draw_card" in stubs:
+                square = arcade.gui.UIFlatButton(text="You have drawn your card!", width=self.button_width, height=self.button_height, style=unclickable_style)
+            if "own_property" in stubs or "buy_property" in other_actions:
+                property_name = self.game.active_property().name
+                if "buy_property" in other_actions:
+                    # Buy the property
+                    square = arcade.gui.UIFlatButton(text=f"Buy {property_name}", width=self.button_width, height=self.button_height)
+                    square.on_click = self.on_buy_property
+                elif "own_property" in stubs:
+                    # Grey out buy button
+                    square = arcade.gui.UIFlatButton(text=f"You own {property_name}", width=self.button_width, height=self.button_height, style=unclickable_style)
+            if "pay_rent" in required_actions:
+                # Pay rent
+                square = arcade.gui.UIFlatButton(text=f"Pay ${self.game.rent_owed} Rent", width=self.button_width, height=self.button_height)
+                square.on_click = self.on_pay_rent
+            elif "pay_rent" in stubs:
+                square = arcade.gui.UIFlatButton(text=f"No rent owed!", width=self.button_width, height=self.button_height, style=unclickable_style)
+            if square is not None:
+                self.left_layout.add(square)
         self.manager.add(self.left_layout)
 
         # Manage the buttons on the right side of the screen
