@@ -10,7 +10,7 @@ class Game():
     """
     class enclosing the engine of the monopoly game
     """
-    def __init__(self, players: list[Player], squares: list[Square], owners: dict[Property, Player]):
+    def __init__(self, players: list, squares: list, owners: dict):
         self.players = players
         self.squares = squares
         self.owners = owners
@@ -250,7 +250,7 @@ class Game():
         player.position = 10
         player.jailtime = 1
 
-    def add_actions(self, dice: list[int]):
+    def add_actions(self, dice: list):
         """
         add_actions updates the appropriate flags based on which square a player landed on
         """

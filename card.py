@@ -13,7 +13,7 @@ class Card():
 
         # Global constants used for drawing cards
         self.sprite_list = arcade.SpriteList()
-        background = arcade.SpriteSolidColor(scale/2, scale/4, (255, 95, 0))
+        background = arcade.SpriteSolidColor(int(scale/2), int(scale/4), (255, 95, 0))
         background.center_x = scale/2
         background.center_y = scale/2
         self.sprite_list.append(background)
