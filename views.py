@@ -106,6 +106,14 @@ class StartView(arcade.View):
         self.render_board()
 
     def render_board(self):
+        self.manager.remove(self.carPiece)
+        self.manager.remove(self.dogPiece)
+        self.manager.remove(self.hatPiece)
+        self.manager.remove(self.shipPiece)
+        self.manager.remove(self.bootPiece)
+        self.manager.remove(self.ironPiece)
+        self.manager.remove(self.thimblePiece)
+        self.manager.remove(self.wheelbarrowPiece)
         game_view = GameView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE, self.player_piece)
         game_view.setup()
         self.window.show_view(game_view)
