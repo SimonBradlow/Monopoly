@@ -13,10 +13,33 @@ class Card():
 
         # Global constants used for drawing cards
         self.sprite_list = arcade.SpriteList()
-        background = arcade.SpriteSolidColor(int(scale/2), int(scale/4), (255, 95, 0))
+
+        if card_type == "Chance":
+            card_color = (255, 95, 0)
+        else:
+            card_color = (255, 215, 0)
+        background = arcade.SpriteSolidColor(int(scale/2), int(scale/4), card_color)
         background.center_x = scale/2
         background.center_y = scale/2
+
+        fixed_desc = desc.replace('.', '\n')
+        text = card_type +'\n\n'+ name +'\n'+ fixed_desc
+        text_sprite = arcade.create_text_sprite(
+            text, 
+            scale/2, 
+            scale/2, 
+            arcade.color.BLACK, 
+            20,
+            font_name = "assets/KabelMediumRegular.ttf",
+            align="center",
+            anchor_x="center", 
+            anchor_y="center",
+        )
+        if text_sprite.width > ((scale/2)-10):
+            text_sprite.scale = ((scale/2)-10)/text_sprite.width
+
         self.sprite_list.append(background)
+        self.sprite_list.append(text_sprite)
 
     def calculate_position(self, position):
         # Determine where player needs to move, calculate how far they need to

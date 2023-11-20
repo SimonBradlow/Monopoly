@@ -29,7 +29,7 @@ class Game():
         self.rent_owed = 0
         self.active_player = self.players[self.turns % len(self.players)]
         self.chance = Deck("Chance")
-        self.chest = Deck("Chest")
+        self.chest = Deck("Community Chest")
         self.card = None
     
     def active_square(self):

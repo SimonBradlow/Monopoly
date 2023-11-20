@@ -8,7 +8,7 @@ class Deck():
     """
     def __init__(self, deck_type: str, cards: list = [], scale: int = 800):
         self.deck_type = deck_type
-        self.cards = cards
+        self.cards = []
 
         # Create whichever deck the user specifies upon initialization
         with open('cards.csv', 'r') as card_file:
@@ -23,7 +23,7 @@ class Deck():
                     category = line['category']
                     effect = line['effect']
                     new_card = Card(card_type, name, desc, category, effect, scale)
-                    cards.append(new_card)
+                    self.cards.append(new_card)
 
     def get_cards(self):
         return self.cards
