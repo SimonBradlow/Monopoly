@@ -595,11 +595,11 @@ class GameOverView(arcade.View):
     def on_draw(self):
         self.clear()
         
-        arcade.draw_text("Game Over", self.SCREEN_WIDTH/2 - 200, 400, arcade.color.WHITE, 54)
-        arcade.draw_text("U suck!", self.SCREEN_WIDTH/2 - 50, 300, arcade.color.WHITE, 24)
+        arcade.draw_text("Game Over!", self.SCREEN_WIDTH/2 - 200, 400, arcade.color.WHITE, 54)
+        arcade.draw_text("Thanks for playing!", self.SCREEN_WIDTH/2 - 140, 300, arcade.color.WHITE, 24)
         
         time_taken_formatted = f"{round(time_taken, 2)} seconds"
-        arcade.draw_text(f"Time taken: {time_taken_formatted}",
+        arcade.draw_text(f"Game time: {time_taken_formatted}",
                          self.SCREEN_WIDTH / 2,
                          200,
                          arcade.color.GRAY,
