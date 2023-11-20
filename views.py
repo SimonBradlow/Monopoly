@@ -490,7 +490,7 @@ class GameView(arcade.View):
             self.left_layout.add(roll_action)
             self.left_layout.add(pay_action)
         elif "rolled_jail" in required_actions and "end_turn" in required_actions:
-            roll_action = custom_gui.BackgroundText(text="You have made your roll", width=self.button_width, height=self.button_height)
+            roll_action = arcade.gui.UIFlatbutton(text="You have made your roll", width=self.button_width, height=self.button_height, style=unclickable_style)
             pay_action = arcade.gui.UIFlatButton(text="End Turn", width=self.button_width, height=self.button_height)
             pay_action.on_click = self.on_end_turn
             self.left_layout.add(roll_action)
