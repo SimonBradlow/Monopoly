@@ -306,10 +306,10 @@ class Game():
         if effect[0] == "money":
             self.active_player.money += effect[1]
         elif effect[0] == "money_players":
-            self.active_player.money += (len(players) - 1) * effect[1]
-            for player in range(len(players)):
-                if Players[p].player_no != self.active_player.player_no:
-                    Players[p].money += -effect[1]
+            self.active_player.money += (len(self.players) - 1) * effect[1]
+            for player in range(len(self.players)):
+                if self.players[p].player_no != self.active_player.player_no:
+                    self.players[p].money += -effect[1]
         elif effect[0] == "money_houses":
             for property in self.active_player.properties:
                 if property.building_count == 5:
