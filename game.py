@@ -212,6 +212,10 @@ class Game():
         else:
             self.move_player(self.active_player, roll[0]+roll[1])
             self.add_actions(roll)
+            # If move lands player on Go to Jail, send the player to jail
+            if self.active_player.position == 30:
+                self.send_to_jail(self.active_player)
+        
         return roll
     
     def roll_jail(self):
@@ -361,5 +365,6 @@ class Game():
                 stubs += [roll_end]
             else:
                 required_actions += [roll_end]
-            return required_actions, other_actions, stubs
+        
+        return required_actions, other_actions, stubs
             
