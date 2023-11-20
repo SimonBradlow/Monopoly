@@ -72,14 +72,29 @@ class Game():
     def end_turn(self):
         """
         end_turn resets the turn based actions and increments the turn counter
+        If the player tries to end their turn with a balance less than 0, the game ends and
+        their properites are returned to the bank
         """
-        if self.active_player.jailtime > 0:
-            # If they player is in jail, increment how long they have been there
-            self.active_player.jailtime += 1
-        self.turns += 1
-        self.doubles = 0
-        self.rolled = 0
-        self.active_player = self.players[self.turns % len(self.players)]
+        if self.active_player.money < 0:
+            # Remove properties from player
+            for p in range(len(self.active_player.properties)):
+                del self.active_player.properties[p]
+            
+            # Return player's properties to the bank
+            for p in self.owners:
+                if self.owners[p] == self.active_player:
+                    self.owners[p] = None
+
+            # Game is over
+            return -1
+        else:
+            if self.active_player.jailtime > 0:
+                # If they player is in jail, increment how long they have been there
+                self.active_player.jailtime += 1
+            self.turns += 1
+            self.doubles = 0
+            self.rolled = 0
+            self.active_player = self.players[self.turns % len(self.players)]
     
     def calculate_rent(self, p: Property, dice_total = None):
         """Calculate the rent owed for a certain property, if unowned or mortgaged rent is 0"""
@@ -368,3 +383,4 @@ class Game():
         
         return required_actions, other_actions, stubs
             
+

@@ -9,6 +9,12 @@ from board import Board
 import custom_gui
 import random
 from game import Game
+import time
+
+# Global variables used to measure game's time length
+start_time = 0
+end_time = 0
+time_taken = 0
 
 # START SCREEN VIEW
 class StartView(arcade.View):
@@ -53,14 +59,22 @@ class StartView(arcade.View):
         height = self.SCREEN_HEIGHT/8
 
         #create buttons for piece selection
-        self.carPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="car", image=Image.open('assets/car.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)-(width/2)), y=(((self.SCREEN_HEIGHT/8)*3)-50))
-        self.dogPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="dog", image=Image.open('assets/dog.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)*3)-(width/2), y=(((self.SCREEN_HEIGHT/8)*3)-(height/2)))
-        self.hatPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="hat", image=Image.open('assets/hat.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)*5)-(width/2), y=(((self.SCREEN_HEIGHT/8)*3)-(height/2)))
-        self.shipPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="ship", image=Image.open('assets/ship.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)*7)-(width/2), y=((self.SCREEN_HEIGHT/8)*3)-(height/2))
-        self.bootPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="boot", image=Image.open('assets/boot.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)-(width/2)), y=((self.SCREEN_HEIGHT/8)-(height/2)))
-        self.ironPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="iron", image=Image.open('assets/iron.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)*3)-(width/2), y=((self.SCREEN_HEIGHT/8)-(height/2)))
-        self.thimblePiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="thimble", image=Image.open('assets/thimble.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)*5)-(width/2), y=((self.SCREEN_HEIGHT/8)-(height/2)))
-        self.wheelbarrowPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="wheelbarrow", image=Image.open('assets/wheelbarrow.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)*7)-(width/2), y=((self.SCREEN_HEIGHT/8)-(height/2)))
+        self.carPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="car", image=Image.open('assets/car.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, 
+x=((self.SCREEN_WIDTH/8)-(width/2)), y=(((self.SCREEN_HEIGHT/8)*3)-50))
+        self.dogPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="dog", image=Image.open('assets/dog.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, 
+x=((self.SCREEN_WIDTH/8)*3)-(width/2), y=(((self.SCREEN_HEIGHT/8)*3)-(height/2)))
+        self.hatPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="hat", image=Image.open('assets/hat.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, 
+x=((self.SCREEN_WIDTH/8)*5)-(width/2), y=(((self.SCREEN_HEIGHT/8)*3)-(height/2)))
+        self.shipPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="ship", image=Image.open('assets/ship.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, 
+x=((self.SCREEN_WIDTH/8)*7)-(width/2), y=((self.SCREEN_HEIGHT/8)*3)-(height/2))
+        self.bootPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="boot", image=Image.open('assets/boot.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, 
+x=((self.SCREEN_WIDTH/8)-(width/2)), y=((self.SCREEN_HEIGHT/8)-(height/2)))
+        self.ironPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="iron", image=Image.open('assets/iron.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, 
+x=((self.SCREEN_WIDTH/8)*3)-(width/2), y=((self.SCREEN_HEIGHT/8)-(height/2)))
+        self.thimblePiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="thimble", image=Image.open('assets/thimble.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, 
+x=((self.SCREEN_WIDTH/8)*5)-(width/2), y=((self.SCREEN_HEIGHT/8)-(height/2)))
+        self.wheelbarrowPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="wheelbarrow", image=Image.open('assets/wheelbarrow.png')), width=self.SCREEN_WIDTH/8, 
+height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)*7)-(width/2), y=((self.SCREEN_HEIGHT/8)-(height/2)))
 
         self.manager.add(self.carPiece)
         self.manager.add(self.dogPiece)
@@ -106,6 +120,8 @@ class StartView(arcade.View):
         self.render_board()
 
     def render_board(self):
+        global start_time
+        start_time = time.time()
         game_view = GameView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE, self.player_piece)
         game_view.setup()
         self.window.show_view(game_view)
@@ -442,8 +458,14 @@ class GameView(arcade.View):
         self.update_buttons()
 
     def on_end_turn(self, event):
-        self.game.end_turn()
-        self.update_buttons()
+        if self.game.end_turn() == -1:
+            global end_time
+            end_time = time.time()
+            end_view = GameOverView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
+            end_view.setup()
+            self.window.show_view(end_view)
+        else:
+            self.update_buttons()
     
     def on_buy_property(self, event):
         self.game.buy_property(self.game.active_property(), self.game.active_player)
@@ -556,12 +578,14 @@ class GameView(arcade.View):
 class GameOverView(arcade.View):
 
     def __init__(self, w, h, e):
-        super.__init__()
+        super().__init__()
 
         arcade.set_background_color(arcade.color.BLACK)
-        self.SCREEN_HEIGHT = w
-        self.SCREEN_WIDTH = h
+        self.SCREEN_HEIGHT = h
+        self.SCREEN_WIDTH = w
         self.EDGE_SPACE = e
+        global time_taken
+        time_taken = end_time - start_time
 
     def setup(self):
         pass
@@ -571,13 +595,15 @@ class GameOverView(arcade.View):
     def on_draw(self):
         self.clear()
         
-        arcade.draw_text("Game Over", self.width/2 - 200, 400, arcade.color.WHITE, 54)
-        arcade.draw_text("U suck!", self.width/2 - 50, 300, arcade.color.WHITE, 24)
-
-        time_taken_formatted = f"{round(self.time_taken, 2)} seconds"
+        arcade.draw_text("Game Over", self.SCREEN_WIDTH/2 - 200, 400, arcade.color.WHITE, 54)
+        arcade.draw_text("U suck!", self.SCREEN_WIDTH/2 - 50, 300, arcade.color.WHITE, 24)
+        
+        time_taken_formatted = f"{round(time_taken, 2)} seconds"
         arcade.draw_text(f"Time taken: {time_taken_formatted}",
-                         self.width / 2,
+                         self.SCREEN_WIDTH / 2,
                          200,
                          arcade.color.GRAY,
                          font_size=15,
                          anchor_x="center")
+        
+
