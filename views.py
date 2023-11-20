@@ -181,10 +181,12 @@ class PropertyView(arcade.View):
         self.card_x = self.SCREEN_WIDTH / 2
         self.card_y = self.SCREEN_HEIGHT / 2
 
-        # Draw first property the player holds
-        self.player.properties[self.active_property].draw(self.card_x, self.card_y)
-
-        self.manager.draw()
+        if len(self.player.properties) == 0:
+            pass
+        else:
+            # Draw first property the player holds
+            self.player.properties[self.active_property].draw(self.card_x, self.card_y)
+            self.manager.draw()
 
     def on_key_press(self, symbol: int, modifiers: int):
         # if player presses esc button the view returns to board.
@@ -227,8 +229,11 @@ class PropertyView(arcade.View):
 
     def on_update(self, delta_time: float):
 
-        # Draw first property the player holds
-        self.player.properties[self.active_property].draw(self.card_x, self.card_y)
+        if len(self.player.properties) == 0:
+            pass
+        else:
+            # Draw first property the player holds
+            self.player.properties[self.active_property].draw(self.card_x, self.card_y)
 
     def scroll_left(self, event):
 
