@@ -4,7 +4,7 @@ class Card():
     """
     Class representing an individual card.
     """
-    def __init__(self, card_type: str = "", name: str = "", desc: str = "", category: str = "", effect: int = 0, scale):
+    def __init__(self, card_type: str = "", name: str = "", desc: str = "", category: str = "", effect: int = 0, scale: int = 600):
         self.card_type = card_type
         self.name = name
         self.desc = desc
