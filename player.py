@@ -9,12 +9,13 @@ class Player():
     """
     class representing individual player in monopoly
     """
-    def __init__(self, pNumber, piece, scale, position: int =0, properties: list =[], money: int =1500, jailtime: int = 0):
+    def __init__(self, pNumber, piece, scale, position: int =0, properties: list =[], money: int =1500, jailtime: int = 0, jail_free = False):
         self.player_no = pNumber
         self.position = position
         self.properties = properties
         self.money = money
         self.jailtime = jailtime
+        self.jail_free = jail_free
 
         self.piece = piece
         self.sprite_list = arcade.SpriteList()

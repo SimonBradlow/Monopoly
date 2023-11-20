@@ -8,6 +8,7 @@ from player import Player
 from board import Board
 import custom_gui
 import random
+from game import Game
 
 # START SCREEN VIEW
 class StartView(arcade.View):
@@ -276,15 +277,7 @@ class GameView(arcade.View):
 
         # Game information to track
         self.board.players = [Player(0, self.player_piece, self.board.tile_width)]
-        self.properties = self.board.properties
-        self.owners = self.board.owners
-        self.turn = 0
-        self.doubles = 0
-        self.rolled = 0
-        self.taxes_to_pay = False
-        self.card_to_draw = False
-        self.rent_to_pay = False
-        self.rent_owed = 0
+        self.game = Game(self.board.players, self.board.squares, self.board.owners)
         self.active_player = self.board.players[0]
 
         # Create UI manager
@@ -371,17 +364,7 @@ class GameView(arcade.View):
         # This is where you would check the win condition for GameOverView()
 
         # Check which player's turn it is
-        self.active_player = self.board.players[self.turn % len(self.board.players)]
-
-        # If human turn, handle human interaction
-        if type(self.active_player) is Player:
-            pass
-
-        # If computer turn, handle computer interaction
-        else:
-            pass
-
-        pass
+        self.active_player = self.board.players[self.game.turns % len(self.board.players)]
 
     def on_key_press(self, key, key_modifiers):
         """
@@ -426,7 +409,7 @@ class GameView(arcade.View):
         pass
 
     def on_roll_dice(self, event):
-        roll = self.board.roll()
+        roll = self.game.roll_move()
 
         # DICE RENDER FUNCTIONALITY
         self.die_sprites.clear()
@@ -450,56 +433,27 @@ class GameView(arcade.View):
                 i += 1
         for s in die_list:
             self.die_sprites.append(s)
-
-        self.rolled += 1
-        if roll[0] == roll[1]:
-            self.doubles +=1
-        if self.doubles >= 3:
-            self.send_to_jail(self.active_player)
-        else:
-            self.board.move_player(self.active_player, roll[0] + roll[1])
-            # Update game variables based on where the player ends up
-            if self.board.squares[self.active_player.position].property.group == "Tax":
-                self.taxes_to_pay = True
-            elif self.board.squares[self.active_player.position].property.group in ["Chance", "Chest"]:
-                self.card_to_draw = True
-            elif self.board.squares[self.active_player.position].property.group not in ["Go", "Jail", "Parking", "GoToJail"]:
-                if self.owners[self.board.squares[self.active_player.position].property] != self.active_player:
-                    self.rent_owed = self.board.calculate_rent(self.board.squares[self.active_player.position].property, roll)
-                    if self.rent_owed > 0:
-                        self.rent_to_pay = True
+        
         self.update_buttons()
 
     def on_end_turn(self, event):
-        if self.active_player.jailtime > 0:
-            self.active_player.jailtime += 1
-        self.rolled = 0
-        self.doubles = 0
-        self.turn += 1
+        self.game.end_turn()
         self.update_buttons()
     
     def on_buy_property(self, event):
-        prop = self.board.squares[self.active_player.position].property
-        self.board.buy_property(prop, self.active_player)
+        self.game.buy_property(self.game.active_property(), self.game.active_player)
         self.update_buttons()
     
     def on_pay_rent(self, event):
-        prop = self.board.squares[self.active_player.position].property
-        owner = self.owners[prop]
-        self.active_player.money -= self.rent_owed
-        owner.money += self.rent_owed
-        self.rent_to_pay = False
-        self.rent_owed = 0
+        self.game.pay_rent()
         self.update_buttons()
     
     def on_pay_taxes(self, event):
-        # Dummy function to pay taxes, doesn't actually remove money
-        self.taxes_to_pay = False
+        self.game.pay_tax()
         self.update_buttons()
     
     def on_draw_card(self, event):
-        # Dummy function to draw card, removes flag but doesn't actually draw the card
-        self.card_to_draw = False
+        self.game.draw_card()
         self.update_buttons()
 
     def on_view_properties(self, event):
@@ -507,89 +461,77 @@ class GameView(arcade.View):
         self.window.show_view(property_view)
 
     def on_roll_jail(self, event):
-        # Roll dice to get out of jail
-        dice = self.board.roll()
-        self.rolled += 1
-        if dice[0] == dice[1]:
-            # If doubles are rolled, the player gets out of jail and moves that far
-            self.active_player.jailtime = 0
-            self.board.move_player(self.active_player, dice[0] + dice[1])
-        elif self.active_player.jailtime > 3:
-            # If the player has been in jail for 3 turns and fails to roll doubles, they must pay the fine and move
-            self.active_player.money -= 50
-            self.active_player.jailtime = 0
-            self.board.move_player(self.active_player, dice[0] + dice[1])
+        self.game.roll_jail()
         self.update_buttons()
 
     def on_pay_fine(self, event):
-        # If the player chooses to pay their fine
-        self.active_player.money -= 50
-        self.active_player.jailtime = 0
+        self.game.pay_fine()
         self.update_buttons()
 
     def update_buttons(self):
+        unclickable_style = {"bg_color_pressed": arcade.color.BLACK, "border_color_pressed": arcade.color.BLACK, "font_color_pressed": arcade.color.WHITE}
         # Remove the old buttons
         self.manager.remove(self.left_layout)
         # Create the new container for the left buttons
         self.left_layout = arcade.gui.UIBoxLayout(vertical=True, x=0, y=100)
+
+        required_actions, other_actions, stubs = self.game.legal_actions()
         # Check if the player is in jail
-        if self.active_player.jailtime > 0:
-            if self.rolled == 0:
-                roll_action = arcade.gui.UIFlatButton(text="Roll for Doubles", width=self.button_width, height=self.button_height)
-                roll_action.on_click = self.on_roll_jail
-                pay_action = arcade.gui.UIFlatButton(text="Pay your $50 Fine", width=self.button_width, height=self.button_height)
-                pay_action.on_click = self.on_pay_fine
-            else:
-                roll_action = custom_gui.BackgroundText(text="You have made your roll", width=self.button_width, height=self.button_height)
-                pay_action = arcade.gui.UIFlatButton(text="End Turn", width=self.button_width, height=self.button_height)
-                pay_action.on_click = self.on_end_turn
+        if "roll_jail" in required_actions and "pay_fine" in required_actions:
+            roll_action = arcade.gui.UIFlatButton(text="Roll for Doubles", width=self.button_width, height=self.button_height)
+            roll_action.on_click = self.on_roll_jail
+            pay_action = arcade.gui.UIFlatButton(text="Pay your $50 Fine", width=self.button_width, height=self.button_height)
+            pay_action.on_click = self.on_pay_fine
             self.left_layout.add(roll_action)
             self.left_layout.add(pay_action)
-        # If the player is not in jail, proceed normally
+        elif "rolled_jail" in required_actions and "end_turn" in required_actions:
+            roll_action = custom_gui.BackgroundText(text="You have made your roll", width=self.button_width, height=self.button_height)
+            pay_action = arcade.gui.UIFlatButton(text="End Turn", width=self.button_width, height=self.button_height)
+            pay_action.on_click = self.on_end_turn
+            self.left_layout.add(roll_action)
+            self.left_layout.add(pay_action)
         else:
             # Add action button (roll or end turn)
-            if self.rolled <= self.doubles and True not in [self.card_to_draw, self.rent_to_pay, self.taxes_to_pay]:
+            if "roll_move" in required_actions:
                 action = arcade.gui.UIFlatButton(text="Roll Dice", width=self.button_width, height=self.button_height)
                 action.on_click = self.on_roll_dice
-            elif self.rolled <= self.doubles:
-                action = custom_gui.BackgroundText(text="Roll Dice", height=self.button_height, width=self.button_width)
-            elif True not in [self.card_to_draw, self.rent_to_pay, self.taxes_to_pay]:
+            elif "roll_move" in stubs:
+                action = arcade.gui.UIFlatButton(text="Roll Dice", height=self.button_height, width=self.button_width, style=unclickable_style)
+            elif "end_turn" in required_actions:
                 action = arcade.gui.UIFlatButton(text="End Turn", width=self.button_width, height=self.button_height)
                 action.on_click = self.on_end_turn
-            else:
-                action = custom_gui.BackgroundText(text="End Turn", width=self.button_width, height=self.button_height)
+            elif "end_turn" in stubs:
+                action = arcade.gui.UIFlatButton(text="End Turn", width=self.button_width, height=self.button_height, style=unclickable_style)
             self.left_layout.add(action)
             # Add square action (buy property, pay rent, draw card, pay taxes)
             square = None
-            if self.rolled > 0:
-                if self.board.squares[self.active_player.position].property.group == "Tax" and self.taxes_to_pay:
-                    # Pay taxes
-                    square = arcade.gui.UIFlatButton(text="Pay Taxes", width=self.button_width, height=self.button_height)
-                    square.on_click = self.on_pay_taxes
-                elif self.board.squares[self.active_player.position].property.group == "Tax":
-                    square = custom_gui.BackgroundText(text="You have paid your tax!", width=self.button_width, height=self.button_height)
-                elif self.board.squares[self.active_player.position].property.group in ["Chance", "Chest"] and self.card_to_draw:
-                    # Draw a card
-                    square = arcade.gui.UIFlatButton(text="Draw a card", width=self.button_width, height=self.button_height)
-                    square.on_click = self.on_draw_card
-                elif self.board.squares[self.active_player.position].property.group in ["Chance", "Chest"]:
-                    square = custom_gui.BackgroundText(text="You have drawn your card!", width=self.button_width, height=self.button_height)
-                elif self.board.squares[self.active_player.position].property.group not in ['Go', 'Jail', 'Parking', 'GoToJail']:
-                    property_name = self.board.squares[self.active_player.position].property.name
-                    if self.owners[self.board.squares[self.active_player.position].property] is None:
-                        # Buy the property
-                        square = arcade.gui.UIFlatButton(text=f"Buy {property_name}", width=self.button_width, height=self.button_height)
-                        square.on_click = self.on_buy_property
-                    elif self.owners[self.board.squares[self.active_player.position].property] == self.active_player:
-                        # Grey out buy button
-                        square = custom_gui.BackgroundText(text=f"You own {property_name}", width=self.button_width, height=self.button_height)
-                    else:
-                        if self.rent_to_pay:
-                            # Pay rent
-                            square = arcade.gui.UIFlatButton(text=f"Pay ${self.rent_owed} Rent", width=self.button_width, height=self.button_height)
-                            square.on_click = self.on_pay_rent
-                        else:
-                            square = custom_gui.BackgroundText(text=f"No rent owed!", width=self.button_width, height=self.button_height)
+            if "pay_tax" in required_actions:
+                # Pay taxes
+                square = arcade.gui.UIFlatButton(text="Pay Taxes", width=self.button_width, height=self.button_height)
+                square.on_click = self.on_pay_taxes
+            elif "pay_tax" in stubs:
+                square = arcade.gui.UIFlatButton(text="You have paid your tax!", width=self.button_width, height=self.button_height, style=unclickable_style)
+            if "draw_card" in required_actions:
+                # Draw a card
+                square = arcade.gui.UIFlatButton(text="Draw a card", width=self.button_width, height=self.button_height)
+                square.on_click = self.on_draw_card
+            elif "draw_card" in stubs:
+                square = arcade.gui.UIFlatButton(text="You have drawn your card!", width=self.button_width, height=self.button_height, style=unclickable_style)
+            if "own_property" in stubs or "buy_property" in other_actions:
+                property_name = self.game.active_property().name
+                if "buy_property" in other_actions:
+                    # Buy the property
+                    square = arcade.gui.UIFlatButton(text=f"Buy {property_name}", width=self.button_width, height=self.button_height)
+                    square.on_click = self.on_buy_property
+                elif "own_property" in stubs:
+                    # Grey out buy button
+                    square = arcade.gui.UIFlatButton(text=f"You own {property_name}", width=self.button_width, height=self.button_height, style=unclickable_style)
+            if "pay_rent" in required_actions:
+                # Pay rent
+                square = arcade.gui.UIFlatButton(text=f"Pay ${self.game.rent_owed} Rent", width=self.button_width, height=self.button_height)
+                square.on_click = self.on_pay_rent
+            elif "pay_rent" in stubs:
+                square = arcade.gui.UIFlatButton(text=f"No rent owed!", width=self.button_width, height=self.button_height, style=unclickable_style)
             if square is not None:
                 self.left_layout.add(square)
         self.manager.add(self.left_layout)
@@ -601,11 +543,6 @@ class GameView(arcade.View):
         property_button.on_click = self.on_view_properties
         self.right_layout.add(property_button)
         self.manager.add(self.right_layout)
-    
-    def send_to_jail(self, player: Player):
-        # Set the player's position to in jail
-        player.position = 10
-        player.jailtime = 1
 
 
 
