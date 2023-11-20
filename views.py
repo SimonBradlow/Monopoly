@@ -142,6 +142,34 @@ class PropertyView(arcade.View):
         self.manager.enable()
         self.update_buttons()
 
+        # new list for sorting properties
+        self.property_group = []
+
+        for index in range(0, len(self.player.properties)):
+            if self.player.properties[index].group == "Railroad":
+                self.property_group.append(-1)
+            elif self.player.properties[index].group == "Utility":
+                self.property_group.append(0)
+            else:
+                if self.player.properties[index].group == "Brown":
+                    self.property_group.append(1)
+                if self.player.properties[index].group == "LightBlue":
+                    self.property_group.append(2)
+                if self.player.properties[index].group == "Pink":
+                    self.property_group.append(3)
+                if self.player.properties[index].group == "Orange":
+                    self.property_group.append(4)
+                if self.player.properties[index].group == "Red":
+                    self.property_group.append(5)
+                if self.player.properties[index].group == "Yellow":
+                    self.property_group.append(6)
+                if self.player.properties[index].group == "Green":
+                    self.property_group.append(7)
+                if self.player.properties[index].group == "Blue":
+                    self.property_group.append(8)
+
+        self.player.properties.sort(key=dict(zip(self.player.properties, self.property_group)).get)
+
     def on_show_view(self):
         arcade.set_background_color(arcade.color.AMAZON)
 
