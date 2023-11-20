@@ -308,8 +308,8 @@ class Game():
         elif effect[0] == "money_players":
             self.active_player.money += (len(self.players) - 1) * effect[1]
             for player in range(len(self.players)):
-                if self.players[p].player_no != self.active_player.player_no:
-                    self.players[p].money += -effect[1]
+                if self.players[player].player_no != self.active_player.player_no:
+                    self.players[player].money += -effect[1]
         elif effect[0] == "money_houses":
             for property in self.active_player.properties:
                 if property.building_count == 5:
@@ -318,7 +318,7 @@ class Game():
                 else:
                     self.active_player.money += property.building_count * effect[1]
         elif effect[0] == "move_jail":
-            send_to_jail(self.active_player)
+            self.send_to_jail(self.active_player)
         elif effect[0] == "move" or effect[0] == "move_utility" or effect[0] == "move_rr" or effect[0] == "move_abs":
             self.active_player.position = effect[1]
         else:
