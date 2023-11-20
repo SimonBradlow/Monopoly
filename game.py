@@ -30,6 +30,7 @@ class Game():
         self.active_player = self.players[self.turns % len(self.players)]
         self.chance = Deck("Chance")
         self.chest = Deck("Chest")
+        self.card = None
     
     def active_square(self):
         """
@@ -300,6 +301,7 @@ class Game():
             card = self.chance.draw_card()
         else:
             card = self.chest.draw_card()
+        self.card = card
 
         # Implement card's effect on the player
         effect = card.return_effect(self.active_player.position)

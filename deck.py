@@ -6,7 +6,7 @@ class Deck():
     """
     Class representing a deck of cards in Monopoly.
     """
-    def __init__(self, deck_type: str, cards: list = [], scale: int = 600):
+    def __init__(self, deck_type: str, cards: list = [], scale: int = 800):
         self.deck_type = deck_type
         self.cards = cards
 

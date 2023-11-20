@@ -357,6 +357,9 @@ class GameView(arcade.View):
             fund_list.append(fund_sprite)
         fund_list.draw()
 
+        if self.game.card is not None:
+            self.game.card.draw()
+
         if type(self.active_player) is Player:
             self.manager.draw()
 
@@ -411,7 +414,10 @@ class GameView(arcade.View):
         """
         Called when a user releases a mouse button.
         """
-        pass
+        if self.game.card is not None:
+            self.game.card = None
+        else:
+            pass
 
     def on_roll_dice(self, event):
         roll = self.game.roll_move()
