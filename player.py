@@ -28,6 +28,8 @@ class Player():
         player_sprite.center_y = 0
         self.sprite_list.append(player_sprite)
 
+        self.log =[]
+
 
     def get_group_counts(self):
         # Count how many of each type of property the player owns, return it as a defaultdict(int)

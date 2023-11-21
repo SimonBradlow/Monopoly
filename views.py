@@ -364,6 +364,7 @@ class GameView(arcade.View):
         self.board.players = [Player(0, self.player_piece, self.board.tile_width), ComputerPlayer(1, 7 if self.player_piece != 7 else 0, self.board.tile_width)]
         self.game = Game(self.board.players, self.board.squares, self.board.owners, w)
         self.active_player = self.board.players[0]
+        self.chat = []
 
         # Create UI manager
         self.button_width = 200
@@ -437,6 +438,24 @@ class GameView(arcade.View):
             fund_list.append(fund_sprite)
         fund_list.draw()
 
+        # Chat log text interface
+        if len(self.chat) > 0:
+            log_sprite = arcade.create_text_sprite(
+                "\n".join(self.chat[0]), 
+                self.SCREEN_WIDTH, 
+                self.SCREEN_HEIGHT, 
+                arcade.color.WHITE, 
+                16,
+                font_name = "assets/KabelMediumRegular.ttf",
+                align="right",
+                anchor_x="right", 
+                anchor_y="top",
+            )
+            log_sprite.scale = (self.SCREEN_WIDTH/2)/log_sprite.width
+            log_sprite.center_x = self.SCREEN_WIDTH-5-(log_sprite.width/2)
+            log_sprite.center_y = self.SCREEN_HEIGHT-5-(log_sprite.height/2)
+            log_sprite.draw()
+
         if self.game.card is not None:
             self.game.card.draw()
 
@@ -455,6 +474,8 @@ class GameView(arcade.View):
         self.active_player = self.board.players[self.game.turns % len(self.board.players)]
         if type(self.game.active_player) is ComputerPlayer:
             self.game.active_player.take_turn(self.game)
+            self.chat.clear()
+            self.chat.append(self.board.players[1].log)
 
     def on_key_press(self, key, key_modifiers):
         """
