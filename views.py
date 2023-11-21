@@ -548,6 +548,21 @@ class GameView(arcade.View):
         for s in die_list:
             self.die_sprites.append(s)
         
+        #chat log of dice rolls
+        self.chat.clear()
+        log_entry = []
+        entry_string = "You have rolled ["
+        first = True
+        for num in roll:
+            entry_string += str(num)
+            if first:
+                entry_string += ", "
+            first = False
+        entry_string += "], moving to "
+        entry_string += self.board.squares[self.game.active_player.position].property.name
+        log_entry.append(entry_string)
+        self.chat.append(log_entry)
+
         self.update_buttons()
 
     def on_end_turn(self, event):
@@ -562,6 +577,11 @@ class GameView(arcade.View):
     
     def on_buy_property(self, event):
         self.game.buy_property(self.game.active_property(), self.game.active_player)
+        entry = "You have bought "
+        entry += self.board.squares[self.game.active_player.position].property.name
+        entry += " for "
+        entry += str(self.board.squares[self.game.active_player.position].property.price)
+        self.chat[0].append(entry)
         self.update_buttons()
     
     def on_pay_rent(self, event):
