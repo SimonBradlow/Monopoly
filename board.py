@@ -34,7 +34,10 @@ class Board():
                 if line['Space'] == 'Street':
                     p = Property(line['Name'], line['Color'], int(line['Price']), [int(line['Rent'])] + [int(line[f'RentBuild{i}']) for i in range(1, 6)], int(line['PriceBuild']), None, self.SCREEN_WIDTH/3)
                 elif line['Space'] in non_property_names:
-                    p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None, self.SCREEN_WIDTH/3)
+                    if line['Space'] == 'Utility':
+                        p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])] + [int(line[f'RentBuild{1}'])], None, None, self.SCREEN_WIDTH/3)
+                    else:
+                        p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None, self.SCREEN_WIDTH/3)
                 elif line['Space'] in corner_names:
                     p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None, self.SCREEN_WIDTH/3)
                     width = height
@@ -110,8 +113,6 @@ class Board():
                                       board_color, 
                                       border_width, 
                                       logo_tilt_angle - 90)
-
-        property = Property("test", "test", 0, [], 0, 0)
 
         #draw go tile at position 0
         self.squares[0].draw(left_corners_x, bottom_corners_y, bottom_tile_tilt)
