@@ -16,10 +16,11 @@ class ComputerPlayer(Player):
     def take_turn(self, game: Game):
         """
         take_turn checks if this object is the active player, and if so takes their turn in the given game
+        returns a boolean if the player took a turn, and a list of string actions they took during their turn
         """
         # Check that this ComputerPlayer is the active player
         if not game.active_player is self:
-            return False
+            return False, []
         
         # Loop until turn is complete
         done = False
@@ -56,7 +57,7 @@ class ComputerPlayer(Player):
                 done = True
                 game.end_turn()
         print(log)
-        return True
+        return True, log
     
     def buy_upgrades(self, game: Game):
         """
