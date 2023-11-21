@@ -88,16 +88,16 @@ class Game():
             return 0
         # If the property is a utility, rent depends on the dice rolled this turn
         if p.group == "Utility":
-            if owner.get_group_counts(p.group) == 2:
+            if owner.get_group_counts()[p.group] == 2:
                 return p.rents[1] * dice_total
             else:
                 return p.rents[0] * dice_total
         # If the property is a railroad, rent just depends on how many railroads the owner owns
         elif p.group == "Railroad":
-            return p.rents[0] * owner.get_group_counts(p.group)
+            return p.rents[0] * owner.get_group_counts()[p.group]
         # Otherwise, rent depends on whether the player has a monopoly and the buildings on the property
         else:
-            monopoly = owner.get_group_counts(p.group) == self.group_counts(p.group)
+            monopoly = owner.get_group_counts()[p.group] == self.group_counts[p.group]
             if monopoly and p.building_count == 0:
                 return p.rents[0] * 2
             elif monopoly:
