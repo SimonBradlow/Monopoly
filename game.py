@@ -382,8 +382,10 @@ class Game():
             else:
                 if self.owners[self.active_property()] == self.active_player:
                     stubs += ["own_property"]
-                elif self.rolled > 0:
+                elif self.rolled > 0 and self.owners[self.active_property()] is None:
                     other_actions += ["buy_property"]
+                elif self.rolled > 0:
+                    stubs += ["pay_rent"]
             if len(required_actions) > 0:
                 stubs += [roll_end]
             else:
