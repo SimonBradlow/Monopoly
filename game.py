@@ -6,6 +6,8 @@ from deck import Deck
 from collections import defaultdict
 import random
 
+DEBUG = True
+
 class Game():
     """
     class enclosing the engine of the monopoly game
@@ -59,6 +61,10 @@ class Game():
         roll takes a list of integers representing the number of sides on the dice to roll,
         then returns a list of results for those dice being rolled
         """
+        # Debugging console entry for dice values
+        if DEBUG:
+            s = input("Enter the dice rolls as i, i: ")
+            return [int(v) for v in s.split(",")]
         roll = []
         for i in dice:
             roll.append(random.randint(1, i))
