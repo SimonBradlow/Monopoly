@@ -362,7 +362,7 @@ class GameView(arcade.View):
 
         # Game information to track
         self.board.players = [Player(0, self.player_piece, self.board.tile_width), ComputerPlayer(1, 7 if self.player_piece != 7 else 0, self.board.tile_width)]
-        self.game = Game(self.board.players, self.board.squares, self.board.owners)
+        self.game = Game(self.board.players, self.board.squares, self.board.owners, w)
         self.active_player = self.board.players[0]
 
         # Create UI manager

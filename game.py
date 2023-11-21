@@ -10,7 +10,7 @@ class Game():
     """
     class enclosing the engine of the monopoly game
     """
-    def __init__(self, players: list, squares: list, owners: dict):
+    def __init__(self, players: list, squares: list, owners: dict, card_scale: int):
         self.players = players
         self.squares = squares
         self.owners = owners
