@@ -5,6 +5,7 @@ from square import Square
 from deck import Deck
 from collections import defaultdict
 import random
+import arcade
 
 class Game():
     """
@@ -31,6 +32,9 @@ class Game():
         self.chance = Deck("Chance", [], card_scale)
         self.chest = Deck("Community Chest", [], card_scale)
         self.card = None
+        self.SCREEN_WIDTH = card_scale
+
+        self.die_sprites = arcade.SpriteList()
     
     def active_square(self):
         """
@@ -62,6 +66,31 @@ class Game():
         roll = []
         for i in dice:
             roll.append(random.randint(1, i))
+
+        # DICE RENDER FUNCTIONALITY
+        self.die_sprites.clear()
+        die_list = []
+        i = 0
+        while i < 2:
+            tile_width = ((self.SCREEN_WIDTH-200)*(3/4))/9
+            scaling = (tile_width/1.5)/350
+            png_name = "assets/die" + str(roll[i]) + ".png"
+            die_sprite = arcade.Sprite(png_name, scaling)
+            rand_x = random.randint((tile_width*3)*(-1), tile_width*3)
+            rand_y = random.randint((tile_width*3)*(-1), tile_width*3)
+            die_sprite.center_x = self.SCREEN_WIDTH/2 + rand_x
+            die_sprite.center_y = self.SCREEN_WIDTH/2 + rand_y
+            die_sprite.angle = random.randint(0, 90)
+            die_list.append(die_sprite)
+            # Check for overlapping dice and restart if so
+            if (i == 1) and (arcade.check_for_collision(die_list[0], die_list[1])):
+                die_list.clear()
+                i = 0
+            else:
+                i += 1
+        for s in die_list:
+            self.die_sprites.append(s)
+
         return roll
 
     def can_end_turn(self):
