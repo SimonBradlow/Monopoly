@@ -5,6 +5,7 @@ from PIL import Image
 
 import board
 from player import Player
+from computer_player import ComputerPlayer
 from board import Board
 import custom_gui
 import random
@@ -360,7 +361,7 @@ class GameView(arcade.View):
 
 
         # Game information to track
-        self.board.players = [Player(0, self.player_piece, self.board.tile_width)]
+        self.board.players = [Player(0, self.player_piece, self.board.tile_width), ComputerPlayer(1, 7 if self.player_piece != 7 else 0, self.board.tile_width)]
         self.game = Game(self.board.players, self.board.squares, self.board.owners)
         self.active_player = self.board.players[0]
 
@@ -452,6 +453,8 @@ class GameView(arcade.View):
 
         # Check which player's turn it is
         self.active_player = self.board.players[self.game.turns % len(self.board.players)]
+        if type(self.game.active_player) is ComputerPlayer:
+            self.game.active_player.take_turn(self.game)
 
     def on_key_press(self, key, key_modifiers):
         """
