@@ -49,8 +49,8 @@ class StartView(arcade.View):
 
     def update_buttons(self):
         self.manager.clear()
-        width = self.SCREEN_WIDTH/8
-        height = self.SCREEN_HEIGHT/8
+        width = self.SCREEN_WIDTH/6
+        height = self.SCREEN_HEIGHT/6
 
         #create buttons for piece selection
         self.carPiece = arcade.gui.UITextureButton(texture=arcade.Texture(name="car", image=Image.open('assets/car.png')), width=self.SCREEN_WIDTH/8, height=self.SCREEN_HEIGHT/8, x=((self.SCREEN_WIDTH/8)-(width/2)), y=(((self.SCREEN_HEIGHT/8)*3)-50))
@@ -134,9 +134,7 @@ class PropertyView(arcade.View):
         self.tile_height = 225
 
         # variables needed for displaying properties and buying house
-        self.buy_house = arcade.gui.UIFlatButton()
-        self.left_arrow = arcade.gui.UITextureButton()
-        self.right_arrow = arcade.gui.UITextureButton()
+        self.cannot_buy_house = arcade.gui.UIFlatButton()
         self.button_width = 200
         self.button_height = 50
         self.active_property = 0
@@ -154,6 +152,7 @@ class PropertyView(arcade.View):
         # new list for sorting properties
         self.property_group = []
 
+        # Sort properties together by group
         for index in range(0, len(self.player.properties)):
             if self.player.properties[index].group == "Railroad":
                 self.property_group.append(-1)
@@ -179,6 +178,48 @@ class PropertyView(arcade.View):
 
         self.player.properties.sort(key=dict(zip(self.player.properties, self.property_group)).get)
 
+        # Sprite for owning no houses
+        self.no_owned_houses = arcade.create_text_sprite(
+            "You do not own any \nproperties at this time.",
+            self.SCREEN_WIDTH / 2,
+            self.SCREEN_HEIGHT / 2,
+            arcade.color.WHITE,
+            20,
+            font_name="assets/KabelMediumRegular.ttf",
+            align="center",
+            anchor_x="center",
+            anchor_y="center",
+        )
+
+        # Sprite for not being able to buy a house on property
+        self.monopoly_info = arcade.create_text_sprite(
+            "*You may only buy a house on a property \n"
+            "if you have a monopoly over that color - group*",
+            self.SCREEN_WIDTH / 2,
+            (self.SCREEN_HEIGHT / 5),
+            arcade.color.WHITE,
+            10,
+            font_name="assets/KabelMediumRegular.ttf",
+            align="center",
+            anchor_x="center",
+            anchor_y="center",
+        )
+
+        # Sprite for escaping to game
+        self.escape_info = arcade.create_text_sprite(
+            "Press 'esc' to return to game.",
+            self.SCREEN_WIDTH / 2,
+            (self.SCREEN_HEIGHT/15),
+            arcade.color.WHITE,
+            15,
+            font_name="assets/KabelMediumRegular.ttf",
+            align="center",
+            anchor_x="center",
+            anchor_y="center",
+        )
+
+        self.update_buttons()
+
     def on_show_view(self):
         arcade.set_background_color(arcade.color.AMAZON)
 
@@ -190,11 +231,14 @@ class PropertyView(arcade.View):
         self.card_y = self.SCREEN_HEIGHT / 2
 
         if len(self.player.properties) == 0:
-            pass
+            self.no_owned_houses.draw()
         else:
             # Draw first property the player holds
             self.player.properties[self.active_property].draw(self.card_x, self.card_y)
+            self.monopoly_info.draw()
             self.manager.draw()
+
+        self.escape_info.draw()
 
     def on_key_press(self, symbol: int, modifiers: int):
         # if player presses esc button the view returns to board.
@@ -203,37 +247,43 @@ class PropertyView(arcade.View):
             self.window.show_view(self.game_view)
 
     def update_buttons(self):
-        self.manager.clear()
+        #self.manager.clear()
 
         # draw buy house button
-        self.buy_house = arcade.gui.UIFlatButton(text="Buy house", width=self.button_width, height=self.button_height,
-                                                 x=self.SCREEN_WIDTH/2-(self.button_width/2), y=self.SCREEN_HEIGHT-(self.button_height*2))
+        if len(self.player.properties) > 0:
+            if self.player.properties[self.active_property].group in self.color_names:
+                if self.game_view.game.can_buy_house(self.player.properties[self.active_property], self.player):
+                    # Button for buying a house
+                    self.buy_house = arcade.gui.UIFlatButton(text="Buy house", width=self.button_width,
+                                                             height=self.button_height,
+                                                             x=self.SCREEN_WIDTH / 2 - (self.button_width / 2),
+                                                             y=self.SCREEN_HEIGHT - (self.button_height * 2))
+                    self.manager.add(self.buy_house)
+                    self.buy_house.on_click = self.buy_building
 
+        # Texture Button for scrolling right
         self.right_arrow = arcade.gui.UITextureButton(
-            texture=arcade.Texture(name="right arrow", image=Image.open('assets/right_arrow.png')), width=self.SCREEN_WIDTH / 10,
-            height=self.SCREEN_HEIGHT / 10, x=self.SCREEN_WIDTH - (self.SCREEN_WIDTH/10),
-            y=self.SCREEN_HEIGHT/2)
+            texture=arcade.Texture(name="right arrow", image=Image.open('assets/right_arrow.png')),
+            width=self.SCREEN_WIDTH / 10,
+            height=self.SCREEN_HEIGHT / 10, x=self.SCREEN_WIDTH - (self.SCREEN_WIDTH / 10),
+            y=self.SCREEN_HEIGHT / 2)
 
+        # Texture button for scrolling left
         self.left_arrow = arcade.gui.UITextureButton(
-            texture=arcade.Texture(name="left arrow", image=Image.open('assets/left_arrow.png')), width=self.SCREEN_WIDTH / 10,
-            height=self.SCREEN_HEIGHT / 10, x=(self.SCREEN_WIDTH/30),
-            y=self.SCREEN_HEIGHT/2)
+            texture=arcade.Texture(name="left arrow", image=Image.open('assets/left_arrow.png')),
+            width=self.SCREEN_WIDTH / 10,
+            height=self.SCREEN_HEIGHT / 10, x=(self.SCREEN_WIDTH / 30),
+            y=self.SCREEN_HEIGHT / 2)
 
-        self.manager.add(self.buy_house)
         self.manager.add(self.left_arrow)
         self.manager.add(self.right_arrow)
 
-        self.buy_house.on_click = self.buy_property
         self.left_arrow.on_click = self.scroll_left
         self.right_arrow.on_click = self.scroll_right
 
-    def buy_property(self, event):
+    def buy_building(self, event):
 
-        # if type of property is a street
-        if self.player.properties[self.active_property].group in self.color_names:
-            # no more than four houses allowed on a property
-            if self.player.properties[self.active_property].building_count <= 3:
-                self.player.properties[self.active_property].building_count += 1
+        self.game_view.game.buy_house(self.player.properties[self.active_property], self.player)
 
     def on_update(self, delta_time: float):
 
@@ -243,14 +293,18 @@ class PropertyView(arcade.View):
             # Draw first property the player holds
             self.player.properties[self.active_property].draw(self.card_x, self.card_y)
 
+
+
     def scroll_left(self, event):
 
         # if looking at property that isn't first in list
         if self.active_property > 0:
             # look at previous property
             self.active_property -= 1
+
         else:
             pass
+        self.update_buttons()
 
     def scroll_right(self, event):
 
@@ -260,6 +314,7 @@ class PropertyView(arcade.View):
             self.active_property += 1
         else:
             pass
+        self.update_buttons()
 
 
 class GameView(arcade.View):
@@ -504,7 +559,7 @@ class GameView(arcade.View):
             self.left_layout.add(roll_action)
             self.left_layout.add(pay_action)
         elif "rolled_jail" in required_actions and "end_turn" in required_actions:
-            roll_action = arcade.gui.UIFlatbutton(text="You have made your roll", width=self.button_width, height=self.button_height, style=unclickable_style)
+            roll_action = arcade.gui.UIFlatButton(text="You have made your roll", width=self.button_width, height=self.button_height, style=unclickable_style)
             pay_action = arcade.gui.UIFlatButton(text="End Turn", width=self.button_width, height=self.button_height)
             pay_action.on_click = self.on_end_turn
             self.left_layout.add(roll_action)

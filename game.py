@@ -16,7 +16,7 @@ class Game():
         self.owners = owners
         self.group_counts = defaultdict(int)
         for prop in owners.keys():
-            self.group_counts[prop] += 1
+            self.group_counts[prop.group] += 1
         # Track how many houses/hotels the bank has left
         self.bank_houses = 32
         self.bank_hotels = 12
