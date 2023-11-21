@@ -11,7 +11,7 @@ class ComputerPlayer(Player):
         """
         ComputerPlayer initializer calls Player intializer
         """
-        super.__init__(pNumber, piece, scale, position, properties, money, jailtime, jail_free)
+        super().__init__(pNumber, piece, scale, position, properties, money, jailtime, jail_free)
     
     def take_turn(self, game: Game):
         """
@@ -23,29 +23,38 @@ class ComputerPlayer(Player):
         
         # Loop until turn is complete
         done = False
-
+        log = []
         while not done:
             required_actions, other_actions, stubs = game.legal_actions()
             if "roll_move" in required_actions:
-                game.roll_move()
+                roll = game.roll_move()
+                log.append(f"Computer rolled {roll}, moving to {game.active_property().name}")
             elif "roll_jail" in required_actions:
-                if self.should_pay_fine():
+                if self.should_pay_fine(game):
                     game.pay_fine()
+                    log.append(f"Computer paid $50 fine to get out of jail")
                 else:
                     game.roll_jail()
+                    log.append(f"Computer rolled to get out of jail")
             if "pay_rent" in required_actions:
+                log.append(f"Computer paid ${game.rent_owed} to owner of {game.active_property().name}")
                 game.pay_rent()
             elif "draw_card" in required_actions:
+                log.append("Computer drew a card")
                 game.draw_card()
             elif "pay_tax" in required_actions:
+                log.append("Computer paid their taxes")
                 game.pay_tax()
             if "buy_property" in other_actions:
-                if self.should_buy(game.active_property, game):
-                    game.buy_property(game.active_property, self)
+                if self.should_buy(game.active_property(), game):
+                    log.append(f"Computer bought {game.active_property().name} for {game.active_property().price}")
+                    game.buy_property(game.active_property(), self)
             self.buy_upgrades(game)
             if "end_turn" in game.legal_actions()[0]:
+                log.append(f"Computer ended their turn")
                 done = True
                 game.end_turn()
+        print(log)
         return True
     
     def buy_upgrades(self, game: Game):
