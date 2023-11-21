@@ -48,9 +48,10 @@ class ComputerPlayer(Player):
             if "buy_property" in other_actions:
                 if self.should_buy(game.active_property(), game):
                     log.append(f"Computer bought {game.active_property().name} for {game.active_property().price}")
+                    print(game.active_property().name)
                     game.buy_property(game.active_property(), self)
-            self.buy_upgrades(game)
-            if "end_turn" in game.legal_actions()[0]:
+            if "end_turn" in required_actions:
+                self.buy_upgrades(game)
                 log.append(f"Computer ended their turn")
                 done = True
                 game.end_turn()
