@@ -580,7 +580,7 @@ class GameOverView(arcade.View):
     def __init__(self, w, h, e):
         super().__init__()
 
-        arcade.set_background_color(arcade.color.BLACK)
+        arcade.set_background_color(arcade.color.AMAZON)
         self.SCREEN_HEIGHT = h
         self.SCREEN_WIDTH = w
         self.EDGE_SPACE = e
@@ -602,7 +602,7 @@ class GameOverView(arcade.View):
         arcade.draw_text(f"Game time: {time_taken_formatted}",
                          self.SCREEN_WIDTH / 2,
                          200,
-                         arcade.color.GRAY,
+                         arcade.color.WHITE,
                          font_size=15,
                          anchor_x="center")
         
