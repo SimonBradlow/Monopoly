@@ -113,7 +113,7 @@ class Property():
             self.group_text.scale = (self.height/4)/145
 
         else:
-
+            # Non-street sprites drawn here
             self.width = iscale
             self.height = self.width * 1.125
             self.edge = self.width * 0.075
@@ -123,8 +123,7 @@ class Property():
 
             # Create background and border
             background = arcade.create_rectangle_filled(0, 0, self.width, self.height, arcade.color.WHITE)
-            border = arcade.create_rectangle_outline(0, 0, self.width - self.edge, self.height - self.edge,
-                                                     arcade.color.BLACK, 1)
+            border = arcade.create_rectangle_outline(0, 0, self.width - self.edge, self.height - self.edge, arcade.color.BLACK, 1)
             # Append to shape list
             self.shape_list = arcade.ShapeElementList()
             self.shape_list.append(background)
@@ -202,52 +201,122 @@ class Property():
             )
             self.group_text.scale = (self.height / 4) / 145
 
+        # Mortgaged properties drawn here
+        self.width = iscale
+        self.height = self.width * 1.125
+        self.edge = self.width * 0.075
+
+        #Create background shapes
+        mbackground = arcade.create_rectangle_filled(0, 0, self.width, self.height, arcade.color.WHITE)
+        mborder = arcade.create_rectangle_filled(0, 0, self.width - self.edge, self.height - self.edge, arcade.color.RED)
+
+        # Append to shape list
+        self.mshape_list = arcade.ShapeElementList()
+        self.mshape_list.append(mbackground)
+        self.mshape_list.append(mborder)
+
+        self.mortgage_text = arcade.create_text_sprite(
+            "MORTGAGED", 
+            0, 
+            0, 
+            arcade.color.WHITE, 
+            24,
+            font_name = "assets/KabelMediumRegular.ttf",
+            align="center",
+            anchor_x="center", 
+            anchor_y="center",
+        )
+        self.mortgage_text.scale = (self.height/4)/115
+        self.mortgage_name = arcade.create_text_sprite(
+            self.name.upper() + "\nMortgaged for $" + str(self.price/2), 
+            0, 
+            0, 
+            arcade.color.WHITE, 
+            18,
+            font_name = "assets/KabelMediumRegular.ttf",
+            align="center",
+            anchor_x="center", 
+            anchor_y="center",
+        )
+        self.mortgage_name.scale = (self.height/4)/115
+        self.mortgage_extra = arcade.create_text_sprite(
+            "Card must be turned\nthis side up\nif property is mortgaged", 
+            0, 
+            0, 
+            arcade.color.WHITE, 
+            14,
+            font_name = "assets/KabelMediumRegular.ttf",
+            align="center",
+            anchor_x="center", 
+            anchor_y="center",
+        )
+        self.mortgage_extra.scale = (self.height/4)/115
+
     def draw(self, x, y):
+        if self.mortgaged == False:
+            # Set position of the tile
+            self.shape_list.center_x = x
+            self.shape_list.center_y = y
 
-        # Set position of the tile
-        self.shape_list.center_x = x
-        self.shape_list.center_y = y
-
-        # Set position of group text
-        self.group_text.center_x = x
-        self.group_text.center_y = y - (((self.height - self.edge * 2) / 20) * 9)
-
-        if self.group in self.color_names:
-
-            # Draw the shape_list
-            self.shape_list.draw()
-
-            self.deed_title.center_x = x
-            self.deed_title.center_y = y+(((self.height-self.edge*2)/20)*9)
-            self.deed_title.draw()
-
-            self.name_text.center_x = x
-            self.name_text.center_y = y+(((self.height-self.edge*2)/80)*29)
-            self.name_text.draw()
-
-            self.rent_text.center_x = x
-            self.rent_text.center_y = y-(((self.height-self.edge*2)/40)*3)
-            self.rent_text.draw()
-
+            # Set position of group text
             self.group_text.center_x = x
-            self.group_text.center_y = y-(((self.height-self.edge*2)/20)*9)
-            self.group_text.draw()
+            self.group_text.center_y = y - (((self.height - self.edge * 2) / 20) * 9)
 
-        elif self.group == "Railroad" or self.group == "Utility":
+            if self.group in self.color_names:
 
-            # Set position of sprites
-            self.sprite_list.center_x = x
-            self.sprite_list.center_y = y
-            self.tile_sprite.center_x = x
-            self.tile_sprite.center_y = y
+                # Draw the shape_list
+                self.shape_list.draw()
 
-            # Draw the sprite_list, shape list and tile sprite
-            self.shape_list.draw()
-            self.sprite_list.draw()
-            self.tile_sprite.draw()
+                self.deed_title.center_x = x
+                self.deed_title.center_y = y+(((self.height-self.edge*2)/20)*9)
+                self.deed_title.draw()
 
-            # Draw name and group text
-            self.nameText.center_x = x
-            self.nameText.center_y = y - (25*(self.width/200))
-            self.nameText.draw()
-            self.group_text.draw()
+                self.name_text.center_x = x
+                self.name_text.center_y = y+(((self.height-self.edge*2)/80)*29)
+                self.name_text.draw()
+
+                self.rent_text.center_x = x
+                self.rent_text.center_y = y-(((self.height-self.edge*2)/40)*3)
+                self.rent_text.draw()
+
+                self.group_text.center_x = x
+                self.group_text.center_y = y-(((self.height-self.edge*2)/20)*9)
+                self.group_text.draw()
+
+            elif self.group == "Railroad" or self.group == "Utility":
+
+                # Set position of sprites
+                self.sprite_list.center_x = x
+                self.sprite_list.center_y = y
+                self.tile_sprite.center_x = x
+                self.tile_sprite.center_y = y
+
+                # Draw the sprite_list, shape list and tile sprite
+                self.shape_list.draw()
+                self.sprite_list.draw()
+                self.tile_sprite.draw()
+
+                # Draw name and group text
+                self.nameText.center_x = x
+                self.nameText.center_y = y - (25*(self.width/200))
+                self.nameText.draw()
+                self.group_text.draw()
+
+        else:
+            if (self.group in self.color_names) or self.group == "Railroad" or self.group == "Utility":
+                # Draw mortgaged-only stuff here
+                self.mshape_list.center_x = x
+                self.mshape_list.center_y = y
+                self.mshape_list.draw()
+
+                self.mortgage_text.center_x = x
+                self.mortgage_text.center_y = y+(((self.height-self.edge*2)/8)*3)
+                self.mortgage_text.draw()
+
+                self.mortgage_name.center_x = x
+                self.mortgage_name.center_y = y
+                self.mortgage_name.draw()
+
+                self.mortgage_extra.center_x = x
+                self.mortgage_extra.center_y = y-(((self.height-self.edge*2)/8)*3)
+                self.mortgage_extra.draw()
