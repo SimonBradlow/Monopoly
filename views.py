@@ -265,7 +265,7 @@ class PropertyView(arcade.View):
             self.window.show_view(self.game_view)
 
     def update_buttons(self):
-        #self.manager.clear()
+        self.manager.clear()
 
         # draw buy house button
         if len(self.player.properties) > 0:
@@ -278,6 +278,21 @@ class PropertyView(arcade.View):
                                                              y=self.SCREEN_HEIGHT - (self.button_height * 2))
                     self.manager.add(self.buy_house)
                     self.buy_house.on_click = self.buy_building
+            # Draw mortgage property button
+            if self.game_view.game.can_mortgage(self.player.properties[self.active_property]):
+                self.mortgage_button = arcade.gui.UIFlatButton(text="Mortgage Property", width=self.button_width,
+                                                               height=self.button_height,
+                                                               x=self.SCREEN_WIDTH / 2 + (self.button_width / 2),
+                                                               y=self.SCREEN_HEIGHT - (self.button_height * 2))
+                self.manager.add(self.mortgage_button)
+                self.mortgage_button.on_click = self.mortgage_property
+            elif self.game_view.game.can_unmortgage(self.player.properties[self.active_property], self.player):
+                self.mortgage_button = arcade.gui.UIFlatButton(text="Unmortgage Property", width=self.button_width,
+                                                               height=self.button_height,
+                                                               x=self.SCREEN_WIDTH / 2 + (self.button_width / 2),
+                                                               y=self.SCREEN_HEIGHT - (self.button_height * 2))
+                self.manager.add(self.mortgage_button)
+                self.mortgage_button.on_click = self.unmortgage_property
 
         # Texture Button for scrolling right
         self.right_arrow = arcade.gui.UITextureButton(
@@ -298,6 +313,14 @@ class PropertyView(arcade.View):
 
         self.left_arrow.on_click = self.scroll_left
         self.right_arrow.on_click = self.scroll_right
+
+    def mortgage_property(self, event):
+        self.game_view.game.mortgage(self.player.properties[self.active_property], self.player)
+        self.update_buttons()
+
+    def unmortgage_property(self, event):
+        self.game_view.game.unmortgage(self.player.properties[self.active_property], self.player)
+        self.update_buttons()
 
     def buy_building(self, event):
 
