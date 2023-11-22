@@ -39,6 +39,4 @@ class Deck():
         else:
             index = random.randint(0, num_cards - 1)
             card = self.cards[index]
-            del self.cards[index]
-            num_cards = num_cards - 1
             return card
