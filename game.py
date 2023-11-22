@@ -325,7 +325,7 @@ class Game():
         self.card = card
 
         # Implement card's effect on the player
-        effect = card.return_effect(self.active_player.position)
+        effect = card.return_effect(self.active_player.position, self.active_player)
         if effect[0] == "money":
             self.active_player.money += effect[1]
         elif effect[0] == "money_players":

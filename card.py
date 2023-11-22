@@ -1,3 +1,4 @@
+from player import Player
 import arcade
 
 class Card():
@@ -41,21 +42,28 @@ class Card():
         self.sprite_list.append(background)
         self.sprite_list.append(text_sprite)
 
-    def calculate_position(self, position):
+    def calculate_position(self, position, player: Player):
         # Determine where player needs to move, calculate how far they need to
         # move from their current position
         name = self.name
         if 'Go' in name:
+            player.money += 200
             return 0
         elif 'Illinois Ave.' in name:
+            if position > 24:
+                player.money += 200
             return 24
         elif 'St. Charles Place' in name:
+            if position > 11:
+                player.money += 200
             return 11
         elif 'nearest Utility' in name:
             electric_company = 12
             water_works = 28
 
             if position < electric_company or position > water_works:
+                if position > water_works:
+                    player.money += 200
                 return electric_company
             else:
                 return water_works
@@ -66,6 +74,8 @@ class Card():
             sl = 35
 
             if position < rr or position > sl:
+                if position > sl:
+                    player.money += 200
                 return rr
             elif position < pr:
                 return pr
@@ -78,11 +88,13 @@ class Card():
         elif 'Go to Jail' in name:
             return 10
         elif 'Reading Railroad' in name:
+            if position > 5:
+                player.money += 200
             return 5
         elif 'Boardwalk' in name:
             return 39
 
-    def return_effect(self, position):
+    def return_effect(self, position, player: Player):
         category = self.category
         if category == "money" or category == "money_players":
             return (category, int(self.effect))
@@ -92,7 +104,7 @@ class Card():
             else:
                 return (category, -40, -115)
         elif category == "move" or category == "move_jail" or category == "move_utility" or category == "move_rr" or category == "move_abs":
-            position = self.calculate_position(position)
+            position = self.calculate_position(position, player)
             return (category, int(position))
         else:
             return (category, 1)
