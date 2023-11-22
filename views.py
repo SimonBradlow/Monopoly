@@ -164,6 +164,7 @@ class PropertyView(arcade.View):
         # Create UI manager
         self.buy_house = None
         self.mortgage_button = None
+        self.sell_house = None
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
 
@@ -268,8 +269,13 @@ class PropertyView(arcade.View):
     def update_buttons(self):
         if self.buy_house is not None:
             self.manager.remove(self.buy_house)
+            self.buy_house = None
         if self.mortgage_button is not None:
             self.manager.remove(self.mortgage_button)
+            self.mortgage_button = None
+        if self.sell_house is not None:
+            self.manager.remove(self.sell_house)
+            self.sell_house = None
 
         # draw buy house button
         if len(self.player.properties) > 0:
@@ -282,6 +288,13 @@ class PropertyView(arcade.View):
                                                              y=self.SCREEN_HEIGHT - (self.button_height * 2))
                     self.manager.add(self.buy_house)
                     self.buy_house.on_click = self.buy_building
+                if self.game_view.game.can_sell_house(self.player.properties[self.active_property]):
+                    self.sell_house = arcade.gui.UIFlatButton(text="Sell house", width=self.button_width,
+                                                             height=self.button_height,
+                                                             x=self.SCREEN_WIDTH / 2 - (self.button_width * 1.5),
+                                                             y=self.SCREEN_HEIGHT - (self.button_height * 2))
+                    self.manager.add(self.sell_house)
+                    self.sell_house.on_click = self.sell_building
             # Draw mortgage property button
             if self.game_view.game.can_mortgage(self.player.properties[self.active_property]):
                 self.mortgage_button = arcade.gui.UIFlatButton(text="Mortgage Property", width=self.button_width,
@@ -329,6 +342,10 @@ class PropertyView(arcade.View):
     def buy_building(self, event):
 
         self.game_view.game.buy_house(self.player.properties[self.active_property], self.player)
+        self.update_buttons()
+    
+    def sell_building(self, event):
+        self.game_view.game.sell_house(self.player.properties[self.active_property], self.player)
         self.update_buttons()
 
     def on_update(self, delta_time: float):
