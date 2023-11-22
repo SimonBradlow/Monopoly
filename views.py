@@ -35,12 +35,6 @@ class StartView(arcade.View):
 
         self.background = arcade.load_texture("./assets/table.png")
 
-    def on_draw(self):
-        self.clear()
-        arcade.draw_lrwh_rectangle_textured(0, 0,
-                                            self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
-                                            self.background)
-
         self.welcome = arcade.create_text_sprite("Welcome to", 
                          self.SCREEN_WIDTH / 2, 
                          self.SCREEN_HEIGHT / 2 + 200, 
@@ -48,6 +42,21 @@ class StartView(arcade.View):
                          font_size=50, 
                          font_name="assets/KabelMediumRegular.ttf", 
                          anchor_x="center")
+        self.choose = arcade.create_text_sprite("Please Choose your piece", 
+                         self.SCREEN_WIDTH/2, 
+                         self.SCREEN_HEIGHT/2 - 25, 
+                         arcade.color.WHITE_SMOKE, 
+                         font_size=20, 
+                         font_name="assets/KabelMediumRegular.ttf", 
+                         anchor_x="center")
+
+    def on_draw(self):
+        self.clear()
+        arcade.draw_lrwh_rectangle_textured(0, 0,
+                                            self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
+                                            self.background)
+
+
         self.welcome.draw()
         # draw logo
         logo = arcade.load_texture("assets/logo.png")
@@ -56,13 +65,6 @@ class StartView(arcade.View):
         arcade.draw_scaled_texture_rectangle(self.SCREEN_WIDTH / 2,
                                              self.SCREEN_HEIGHT / 2 + 100,
                                              logo, logo_scale, logo_tilt_angle)
-        self.choose = arcade.create_text_sprite("Please Choose your piece", 
-                         self.SCREEN_WIDTH/2, 
-                         self.SCREEN_HEIGHT/2 - 25, 
-                         arcade.color.WHITE_SMOKE, 
-                         font_size=20, 
-                         font_name="assets/KabelMediumRegular.ttf", 
-                         anchor_x="center")
         self.choose.draw()
 
         self.manager.draw()
@@ -743,6 +745,27 @@ class GameOverView(arcade.View):
         self.EDGE_SPACE = e
         global time_taken
         time_taken = end_time - start_time
+        self.game_over = arcade.create_text_sprite("Game Over!", 
+                                                   self.SCREEN_WIDTH/2 - 200, 
+                                                   400, 
+                                                   arcade.color.WHITE, 
+                                                   54,
+                                                   font_name="assets/KabelMediumRegular.ttf")
+        self.thanks = arcade.create_text_sprite("Thanks for playing!", 
+                                                self.SCREEN_WIDTH/2 - 140, 
+                                                300, 
+                                                arcade.color.WHITE, 
+                                                24,
+                                                font_name="assets/KabelMediumRegular.ttf")
+
+        time_taken_formatted = f"{round(time_taken, 2)} seconds"
+        self.timetext = arcade.create_text_sprite(f"Game time: {time_taken_formatted}",
+                                              self.SCREEN_WIDTH / 2,
+                                              200,
+                                              arcade.color.WHITE,
+                                              font_size=15,
+                                              font_name="assets/KabelMediumRegular.ttf",
+                                              anchor_x="center")
 
     def setup(self):
         pass
@@ -754,16 +777,6 @@ class GameOverView(arcade.View):
         arcade.draw_lrwh_rectangle_textured(0, 0,
                                             self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
                                             self.background)
-        
-        arcade.draw_text("Game Over!", self.SCREEN_WIDTH/2 - 200, 400, arcade.color.WHITE, 54)
-        arcade.draw_text("Thanks for playing!", self.SCREEN_WIDTH/2 - 140, 300, arcade.color.WHITE, 24)
-
-        time_taken_formatted = f"{round(time_taken, 2)} seconds"
-        arcade.draw_text(f"Game time: {time_taken_formatted}",
-                         self.SCREEN_WIDTH / 2,
-                         200,
-                         arcade.color.WHITE,
-                         font_size=15,
-                         anchor_x="center")
-
-
+        self.game_over.draw()
+        self.thank.draw()
+        self.timetext.draw()
