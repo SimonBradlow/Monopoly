@@ -7,7 +7,7 @@ class ComputerPlayer(Player):
     """
     ComputerPlayer class is a Player that can also make its own moves in a Game object
     """
-    def __init__(self, pNumber, piece, scale, position: int=0, properties: list =[], money: int =1500, jailtime: int = 0, jail_free = []):
+    def __init__(self, pNumber, piece, scale, position: int=0, properties: list =[], money: int =50, jailtime: int = 0, jail_free = []):
         """
         ComputerPlayer initializer calls Player intializer
         """
@@ -57,6 +57,8 @@ class ComputerPlayer(Player):
                     game.buy_property(game.active_property(), self)
             if "end_turn" in required_actions:
                 self.buy_upgrades(game)
+                if self.money < 0:
+                    self.sell_mortgage(game)
                 self.log.append(f"Computer ended their turn")
                 done = True
                 game.end_turn()
@@ -75,6 +77,31 @@ class ComputerPlayer(Player):
                 if self.should_upgrade(prop, game):
                     game.buy_house(prop, self)
                     bought = True
+    
+    def sell_mortgage(self, game: Game):
+        """
+        sell_mortgage has the ComputerPlayer sell upgrades or mortgage properties to avoid losing
+        """
+        can_sell = True
+        can_mortgage = True
+        while self.money < 0 and (can_sell or can_mortgage):
+            can_sell = False
+            can_mortgage = False
+            for p in self.properties:
+                if game.can_sell_house(p):
+                    can_sell = True
+                elif game.can_mortgage(p):
+                    can_mortgage = True
+            if can_mortgage:
+                for p in self.properties:
+                    if self.money < 0 and game.can_mortgage(p):
+                        game.mortgage(p, self)
+            elif can_sell:
+                for p in self.properties:
+                    if self.money < 0 and game.can_sell_house(p):
+                        game.sell_house(p, self)
+
+
     
     def should_buy(self, property: Property, game: Game):
         """
