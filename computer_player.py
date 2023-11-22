@@ -7,7 +7,7 @@ class ComputerPlayer(Player):
     """
     ComputerPlayer class is a Player that can also make its own moves in a Game object
     """
-    def __init__(self, pNumber, piece, scale, position: int=0, properties: list =[], money: int =50, jailtime: int = 0, jail_free = []):
+    def __init__(self, pNumber, piece, scale, position: int=0, properties: list =[], money: int =1500, jailtime: int = 0, jail_free = []):
         """
         ComputerPlayer initializer calls Player intializer
         """
