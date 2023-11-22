@@ -238,6 +238,7 @@ class PropertyView(arcade.View):
         self.update_buttons()
 
     def on_show_view(self):
+        self.manager.enable()
         arcade.set_background_color(arcade.color.AMAZON)
 
     def on_draw(self):
@@ -260,7 +261,7 @@ class PropertyView(arcade.View):
     def on_key_press(self, symbol: int, modifiers: int):
         # if player presses esc button the view returns to board.
         if symbol == 65307:
-
+            self.manager.disable()
             self.window.show_view(self.game_view)
 
     def update_buttons(self):
@@ -380,7 +381,7 @@ class GameView(arcade.View):
     def on_show_view(self):
         """ Set up the game variables. Call to re-start the game. """
         # Create your sprites and sprite lists here
-        pass
+        self.manager.enable()
 
     def setup(self):
         pass
@@ -532,6 +533,7 @@ class GameView(arcade.View):
 
     def on_end_turn(self, event):
         if self.game.end_turn() == -1:
+            self.manager.disable()
             global end_time
             end_time = time.time()
             end_view = GameOverView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
@@ -557,6 +559,7 @@ class GameView(arcade.View):
         self.update_buttons()
 
     def on_view_properties(self, event):
+        self.manager.disable()
         property_view = PropertyView(self, self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE, self.active_player)
         self.window.show_view(property_view)
 
