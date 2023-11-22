@@ -228,7 +228,7 @@ class Property():
         )
         self.mortgage_text.scale = (self.height/4)/115
         self.mortgage_name = arcade.create_text_sprite(
-            self.name.upper() + "\nMortgaged for $" + str(self.price/2), 
+            self.name.upper() + "\nMortgaged for $" + str(self.price//2), 
             0, 
             0, 
             arcade.color.WHITE, 
