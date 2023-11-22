@@ -7,7 +7,7 @@ class ComputerPlayer(Player):
     """
     ComputerPlayer class is a Player that can also make its own moves in a Game object
     """
-    def __init__(self, pNumber, piece, scale, position: int=0, properties: list =[], money: int =1500, jailtime: int = 0, jail_free = False):
+    def __init__(self, pNumber, piece, scale, position: int=0, properties: list =[], money: int =1500, jailtime: int = 0, jail_free = []):
         """
         ComputerPlayer initializer calls Player intializer
         """
@@ -33,7 +33,10 @@ class ComputerPlayer(Player):
                 self.log.append(f"Computer rolled {roll}, moving to {game.active_property().name}")
                 required_actions, other_actions, stubs = game.legal_actions()
             elif "roll_jail" in required_actions:
-                if self.should_pay_fine(game):
+                if "card_jail" in other_actions and self.should_use_jail_free(game):
+                    game.card_jail()
+                    self.log.append(f"Computer used Get Out of Jail Free!")
+                elif self.should_pay_fine(game):
                     game.pay_fine()
                     self.log.append(f"Computer paid $50 fine to get out of jail")
                 else:
@@ -96,5 +99,13 @@ class ComputerPlayer(Player):
         should_pay_fine determines if the ComputerPlayer should pay their fine to get out of jail
         """
         if self.money < 50:
+            return False
+        return random.random() > 0.5
+
+    def should_use_jail_free(self, game: Game):
+        """
+        should_use_jail_free determines if the ComputerPlayer should use their get out of jail free card
+        """
+        if self.jail_free == []:
             return False
         return random.random() > 0.5

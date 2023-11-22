@@ -619,6 +619,10 @@ class GameView(arcade.View):
     def on_pay_fine(self, event):
         self.game.pay_fine()
         self.update_buttons()
+    
+    def on_card_jail(self, event):
+        self.game.card_jail()
+        self.update_buttons()
 
     def update_buttons(self):
         unclickable_style = {"bg_color_pressed": arcade.color.BLACK, "border_color_pressed": arcade.color.BLACK, "font_color_pressed": arcade.color.WHITE}
@@ -694,6 +698,12 @@ class GameView(arcade.View):
         property_button = arcade.gui.UIFlatButton(text="View Properties", width=self.button_width, height=self.button_height)
         property_button.on_click = self.on_view_properties
         self.right_layout.add(property_button)
+
+        # Add button to use get out of jail free card if it is an option
+        if "card_jail" in other_actions:
+            card_button = arcade.gui.UIFlatButton(text="Get Out Of Jail Free!", width=self.button_width, height=self.button_height)
+            card_button.on_click = self.on_card_jail
+            self.right_layout.add(card_button)
         self.manager.add(self.right_layout)
 
 

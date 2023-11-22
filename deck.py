@@ -39,4 +39,7 @@ class Deck():
         else:
             index = random.randint(0, num_cards - 1)
             card = self.cards[index]
+            # If the card is "Get Out of Jail Free", remove it from the deck for the player to hold
+            if card.category == "item":
+                del self.cards[index]
             return card
