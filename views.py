@@ -212,6 +212,7 @@ class PropertyView(arcade.View):
                 if self.player.properties[index].group == "Blue":
                     self.property_group.append(8)
 
+        # Sort properties
         self.player.properties.sort(key=dict(zip(self.player.properties, self.property_group)).get)
 
         # Sprite for owning no houses
@@ -270,7 +271,9 @@ class PropertyView(arcade.View):
         self.card_x = self.SCREEN_WIDTH / 2
         self.card_y = self.SCREEN_HEIGHT / 2
 
+        # if no owned properties
         if len(self.player.properties) == 0:
+            # display that
             self.no_owned_houses.draw()
         else:
             # Draw first property the player holds
@@ -278,6 +281,7 @@ class PropertyView(arcade.View):
             self.monopoly_info.draw()
             self.manager.draw()
 
+        # display escape info
         self.escape_info.draw()
 
     def on_key_press(self, symbol: int, modifiers: int):
@@ -287,14 +291,18 @@ class PropertyView(arcade.View):
             self.window.show_view(self.game_view)
 
     def update_buttons(self):
+
+        # remove unnecessary buttons from manager
         if self.buy_house is not None:
             self.manager.remove(self.buy_house)
         if self.mortgage_button is not None:
             self.manager.remove(self.mortgage_button)
 
-        # draw buy house button
+        # check if player owns a property
         if len(self.player.properties) > 0:
+            # check if that property is a street
             if self.player.properties[self.active_property].group in self.color_names:
+                # check if the player has a monopoly and can buy a house
                 if self.game_view.game.can_buy_house(self.player.properties[self.active_property], self.player):
                     # Button for buying a house
                     self.buy_house = arcade.gui.UIFlatButton(text="Buy house", width=self.button_width,
@@ -340,20 +348,23 @@ class PropertyView(arcade.View):
         self.right_arrow.on_click = self.scroll_right
 
     def mortgage_property(self, event):
+        #moretgage a property
         self.game_view.game.mortgage(self.player.properties[self.active_property], self.player)
         self.update_buttons()
 
     def unmortgage_property(self, event):
+        # unmortgage a property
         self.game_view.game.unmortgage(self.player.properties[self.active_property], self.player)
         self.update_buttons()
 
     def buy_building(self, event):
-
+        # make the purchase of a building
         self.game_view.game.buy_house(self.player.properties[self.active_property], self.player)
         self.update_buttons()
 
     def on_update(self, delta_time: float):
 
+        # if no owned properties
         if len(self.player.properties) == 0:
             pass
         else:
