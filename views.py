@@ -559,12 +559,12 @@ class GameView(arcade.View):
             self.chat.append(self.board.players[1].log)
             self.update_buttons()
             if self.game.game_over:
-                            self.manager.disable()
-            global end_time
-            end_time = time.time()
-            end_view = GameOverView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
-            end_view.setup()
-            self.window.show_view(end_view)
+                self.manager.disable()
+                global end_time
+                end_time = time.time()
+                end_view = GameOverView(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.EDGE_SPACE)
+                end_view.setup()
+                self.window.show_view(end_view)
 
 
     def on_key_press(self, key, key_modifiers):
