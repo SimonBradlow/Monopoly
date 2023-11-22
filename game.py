@@ -6,7 +6,7 @@ from deck import Deck
 from collections import defaultdict
 import random
 
-DEBUG = True
+DEBUG = False
 
 class Game():
     """
@@ -137,7 +137,7 @@ class Game():
             price = property.price
         if player.money < price:
             return False
-        if self.owners[property] is not None:
+        if property.group != "Parking" and self.owners[property] is not None:
             self.owners[property].money += price
         player.money -= price
         self.owners[property] = player
