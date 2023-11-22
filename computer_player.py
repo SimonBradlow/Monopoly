@@ -30,6 +30,7 @@ class ComputerPlayer(Player):
             if "roll_move" in required_actions:
                 roll = game.roll_move()
                 log.append(f"Computer rolled {roll}, moving to {game.active_property().name}")
+                required_actions, other_actions, stubs = game.legal_actions()
             elif "roll_jail" in required_actions:
                 if self.should_pay_fine(game):
                     game.pay_fine()
