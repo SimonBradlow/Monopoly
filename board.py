@@ -32,12 +32,12 @@ class Board():
                 corner_names = ['Go', 'Jail', 'Parking', 'GoToJail']
                 non_property_names = ['Railroad', 'Utility', 'Tax', 'Chance', 'Chest']
                 if line['Space'] == 'Street':
-                    p = Property(line['Name'], line['Color'], int(line['Price']), [int(line['Rent'])] + [int(line[f'RentBuild{i}']) for i in range(1, 6)], int(line['PriceBuild']), None, self.SCREEN_WIDTH/3)
+                    p = Property(line['Name'], line['Color'], int(line['Price']), [int(line['Rent'])] + [int(line[f'RentBuild{i}']) for i in range(1, 6)], int(line['PriceBuild']), int(line['Price']) // 2, self.SCREEN_WIDTH/3)
                 elif line['Space'] in non_property_names:
                     if line['Space'] == 'Utility':
-                        p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])] + [int(line[f'RentBuild{1}'])], None, None, self.SCREEN_WIDTH/3)
+                        p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])] + [int(line[f'RentBuild{1}'])], None, int(line['Price']) // 2, self.SCREEN_WIDTH/3)
                     else:
-                        p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None, self.SCREEN_WIDTH/3)
+                        p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, int(line['Price']) // 2, self.SCREEN_WIDTH/3)
                 elif line['Space'] in corner_names:
                     p = Property(line['Name'], line['Space'], int(line['Price']), [int(line['Rent'])], None, None, self.SCREEN_WIDTH/3)
                     width = height
