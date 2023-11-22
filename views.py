@@ -455,6 +455,7 @@ class GameView(arcade.View):
         self.active_player = self.board.players[self.game.turns % len(self.board.players)]
         if type(self.game.active_player) is ComputerPlayer:
             self.game.active_player.take_turn(self.game)
+            self.update_buttons()
 
     def on_key_press(self, key, key_modifiers):
         """
