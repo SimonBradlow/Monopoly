@@ -113,8 +113,7 @@ class Game():
         """
         if self.active_player.money < 0:
             # Remove properties from player
-            for p in range(len(self.active_player.properties)):
-                del self.active_player.properties[p]
+            self.active_player.properties = []
             
             # Return player's properties to the bank
             for p in self.owners:
