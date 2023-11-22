@@ -242,6 +242,42 @@ class Game():
         player.money += property.building_cost // 2
         return True
     
+    def can_mortgage(self, property: Property):
+        """
+        can_mortgage returns true if the given property can be mortgaged
+        """
+        return property.building_count == 0
+    
+    def can_unmortgage(self, property: Property, player: Player):
+        """
+        can_unmortgage returns true if the given property can be unmortgaged by the given player
+        """
+        if self.owners[property] is not player or not property.mortgaged:
+            return False
+        return player.money >= property.mortgage_value * 1.1
+    
+    def mortgage(self, property: Property, player: Player):
+        """
+        mortgage has the given player mortgage the given property
+        returns True if successful, False if not
+        """
+        if self.owners[property] is not player or property.mortgaged or not self.can_mortgage(property):
+            return False
+        player.money += property.mortgage_value
+        property.mortgaged = True
+        return True
+    
+    def unmortgage(self, property: Property, player: Player):
+        """
+        unmortgage has the given player unmortgage the given property
+        returns True if successful, False if not
+        """
+        if not self.can_unmortgage(property, player):
+            return False
+        player.money -= int(property.mortgage_value * 1.1)
+        property.mortgaged = False
+        return True
+
     def move_player(self, player: Player, squares: int):
         """
         Move a player a given number of squares
