@@ -246,7 +246,7 @@ class Game():
         """
         can_mortgage returns true if the given property can be mortgaged
         """
-        return property.building_count == 0
+        return property.building_count == 0 and not property.mortgaged
     
     def can_unmortgage(self, property: Property, player: Player):
         """
