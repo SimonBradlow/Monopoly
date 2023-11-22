@@ -35,6 +35,7 @@ class Game():
         self.chest = Deck("Community Chest", [], card_scale)
         self.card = None
         self.SCREEN_WIDTH = card_scale
+        self.game_over = False
 
         self.die_sprites = arcade.SpriteList()
     
@@ -121,7 +122,7 @@ class Game():
                     self.owners[p] = None
 
             # Game is over
-            return -1
+            self.game_over = True
         else:
             if self.active_player.jailtime > 0:
                 # If they player is in jail, increment how long they have been there
