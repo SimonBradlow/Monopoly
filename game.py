@@ -7,7 +7,7 @@ from collections import defaultdict
 import random
 import arcade
 
-DEBUG = True
+DEBUG = False
 
 class Game():
     """
