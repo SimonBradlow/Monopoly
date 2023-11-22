@@ -529,8 +529,12 @@ class GameView(arcade.View):
         self.mouse_sprite.center_y = y
         for s in self.board.squares:
             if arcade.check_for_collision(s.collision_sprite, self.mouse_sprite):
-                s.collision_sprite.color = (255,255,255,75)
-                s.property.render = True
+                if s.property in self.board.players[1].properties:
+                    s.collision_sprite.color = (255,0,0,200)
+                    s.property.render = True
+                else:
+                    s.collision_sprite.color = (255,255,255,75)
+                    s.property.render = True
             else:
                 s.collision_sprite.color = (0,0,0,0)
                 s.property.render = False

@@ -166,7 +166,7 @@ class Game():
             price = property.price
         if player.money < price:
             return False
-        if self.owners[property] is not None:
+        if property.group != "Parking" and self.owners[property] is not None:
             self.owners[property].money += price
         player.money -= price
         self.owners[property] = player
@@ -390,7 +390,7 @@ class Game():
         self.card = card
 
         # Implement card's effect on the player
-        effect = card.return_effect(self.active_player.position)
+        effect = card.return_effect(self.active_player.position, self.active_player)
         if effect[0] == "money":
             self.active_player.money += effect[1]
         elif effect[0] == "money_players":
