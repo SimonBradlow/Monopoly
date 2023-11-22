@@ -33,10 +33,14 @@ class StartView(arcade.View):
         self.manager.enable()
         self.update_buttons()
 
-        arcade.set_background_color(arcade.color.AMAZON)
+        self.background = arcade.load_texture("./assets/table.png")
 
     def on_draw(self):
         self.clear()
+        arcade.draw_lrwh_rectangle_textured(0, 0,
+                                            self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
+                                            self.background)
+
         arcade.draw_text("Welcome to", self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2 + 200,
                          arcade.color.WHITE, font_size=50, anchor_x="center")
         # draw logo
@@ -158,6 +162,8 @@ class PropertyView(arcade.View):
         self.card_x = 0
         self.card_y = 0
 
+        self.background = arcade.load_texture("./assets/table.png")
+
         # identify color names for streets
         self.color_names = ['Brown', 'LightBlue', 'Pink', 'Orange', 'Red', 'Yellow', 'Green', 'Blue']
 
@@ -244,6 +250,9 @@ class PropertyView(arcade.View):
 
     def on_draw(self):
         self.clear()
+        arcade.draw_lrwh_rectangle_textured(0, 0,
+                                            self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
+                                            self.background)
 
         # set where a card is initially rendered in the property view
         self.card_x = self.SCREEN_WIDTH / 2
@@ -374,7 +383,7 @@ class GameView(arcade.View):
 
     def __init__(self, w, h, e, p):
         super().__init__()
-        arcade.set_background_color(arcade.color.AMAZON)
+        self.background = arcade.load_texture("./assets/table.png")
         self.SCREEN_WIDTH = w
         self.SCREEN_HEIGHT = h
         self.EDGE_SPACE = e
@@ -422,7 +431,9 @@ class GameView(arcade.View):
         # This command should happen before we start drawing. It will clear
         # the screen to the background color, and erase what we drew last frame.
         self.clear()
-
+        arcade.draw_lrwh_rectangle_textured(0, 0,
+                                            self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
+                                            self.background)
         # Call draw() on all your sprite lists below
         self.board.draw()
         self.game.die_sprites.draw()
@@ -714,8 +725,7 @@ class GameOverView(arcade.View):
 
     def __init__(self, w, h, e):
         super().__init__()
-
-        arcade.set_background_color(arcade.color.AMAZON)
+        self.background = arcade.load_texture("./assets/table.png")
         self.SCREEN_HEIGHT = h
         self.SCREEN_WIDTH = w
         self.EDGE_SPACE = e
@@ -729,6 +739,9 @@ class GameOverView(arcade.View):
 
     def on_draw(self):
         self.clear()
+        arcade.draw_lrwh_rectangle_textured(0, 0,
+                                            self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
+                                            self.background)
         
         arcade.draw_text("Game Over!", self.SCREEN_WIDTH/2 - 200, 400, arcade.color.WHITE, 54)
         arcade.draw_text("Thanks for playing!", self.SCREEN_WIDTH/2 - 140, 300, arcade.color.WHITE, 24)
