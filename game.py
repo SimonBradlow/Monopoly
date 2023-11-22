@@ -179,8 +179,8 @@ class Game():
         """
         # Make sure the player has a monopoly
         monopoly = self.group_counts[property.group] == player.get_group_counts()[property.group]
-        # Make sure the property isn't mortgaged
-        if monopoly and not property.mortgaged:
+        # Make sure the property isn't mortgaged, and that it is a property that can be upgraded
+        if monopoly and not property.mortgaged and property.building_cost:
             # Check the minimum number of houses on each property in the group
             min_building_count = 5
             for prop in self.owners.keys():
