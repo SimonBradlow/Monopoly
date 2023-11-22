@@ -41,8 +41,14 @@ class StartView(arcade.View):
                                             self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
                                             self.background)
 
-        arcade.draw_text("Welcome to", self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2 + 200,
-                         arcade.color.WHITE, font_size=50, anchor_x="center")
+        self.welcome = arcade.create_text_sprite("Welcome to", 
+                         self.SCREEN_WIDTH / 2, 
+                         self.SCREEN_HEIGHT / 2 + 200, 
+                         arcade.color.WHITE, 
+                         font_size=50, 
+                         font_name="assets/KabelMediumRegular.ttf", 
+                         anchor_x="center")
+        self.welcome.draw()
         # draw logo
         logo = arcade.load_texture("assets/logo.png")
         logo_scale = self.SCREEN_WIDTH / 2500
@@ -50,8 +56,14 @@ class StartView(arcade.View):
         arcade.draw_scaled_texture_rectangle(self.SCREEN_WIDTH / 2,
                                              self.SCREEN_HEIGHT / 2 + 100,
                                              logo, logo_scale, logo_tilt_angle)
-        arcade.draw_text("Please Choose your piece", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2 - 25,
-                         arcade.color.WHITE_SMOKE, font_size=20, anchor_x="center")
+        self.choose = arcade.create_text_sprite("Please Choose your piece", 
+                         self.SCREEN_WIDTH/2, 
+                         self.SCREEN_HEIGHT/2 - 25, 
+                         arcade.color.WHITE_SMOKE, 
+                         font_size=20, 
+                         font_name="assets/KabelMediumRegular.ttf", 
+                         anchor_x="center")
+        self.choose.draw()
 
         self.manager.draw()
 
