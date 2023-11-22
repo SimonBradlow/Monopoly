@@ -789,5 +789,5 @@ class GameOverView(arcade.View):
                                             self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
                                             self.background)
         self.game_over.draw()
-        self.thank.draw()
+        self.thanks.draw()
         self.timetext.draw()
