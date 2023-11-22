@@ -1,5 +1,7 @@
 # Monopoly
 
 ## Description
-The results of our sprint 2. Python Arcade required.
+Results of sprint 3. Python Arcade required.
 The file to run is window.py.
+You may need to change window size to see better resolution.
+These changes can be made in window.py.
