@@ -33,12 +33,31 @@ class StartView(arcade.View):
         self.manager.enable()
         self.update_buttons()
 
-        arcade.set_background_color(arcade.color.AMAZON)
+        self.background = arcade.load_texture("./assets/table.png")
+
+        self.welcome = arcade.create_text_sprite("Welcome to", 
+                         self.SCREEN_WIDTH / 2, 
+                         self.SCREEN_HEIGHT / 2 + 200, 
+                         arcade.color.WHITE, 
+                         font_size=50, 
+                         font_name="assets/KabelMediumRegular.ttf", 
+                         anchor_x="center")
+        self.choose = arcade.create_text_sprite("Please Choose your piece", 
+                         self.SCREEN_WIDTH/2, 
+                         self.SCREEN_HEIGHT/2 - 25, 
+                         arcade.color.WHITE_SMOKE, 
+                         font_size=20, 
+                         font_name="assets/KabelMediumRegular.ttf", 
+                         anchor_x="center")
 
     def on_draw(self):
         self.clear()
-        arcade.draw_text("Welcome to", self.SCREEN_WIDTH / 2, self.SCREEN_HEIGHT / 2 + 200,
-                         arcade.color.WHITE, font_size=50, anchor_x="center")
+        arcade.draw_lrwh_rectangle_textured(0, 0,
+                                            self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
+                                            self.background)
+
+
+        self.welcome.draw()
         # draw logo
         logo = arcade.load_texture("assets/logo.png")
         logo_scale = self.SCREEN_WIDTH / 2500
@@ -46,8 +65,7 @@ class StartView(arcade.View):
         arcade.draw_scaled_texture_rectangle(self.SCREEN_WIDTH / 2,
                                              self.SCREEN_HEIGHT / 2 + 100,
                                              logo, logo_scale, logo_tilt_angle)
-        arcade.draw_text("Please Choose your piece", self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2 - 25,
-                         arcade.color.WHITE_SMOKE, font_size=20, anchor_x="center")
+        self.choose.draw()
 
         self.manager.draw()
 
@@ -158,6 +176,8 @@ class PropertyView(arcade.View):
         self.card_x = 0
         self.card_y = 0
 
+        self.background = arcade.load_texture("./assets/table.png")
+
         # identify color names for streets
         self.color_names = ['Brown', 'LightBlue', 'Pink', 'Orange', 'Red', 'Yellow', 'Green', 'Blue']
 
@@ -195,6 +215,7 @@ class PropertyView(arcade.View):
                 if self.player.properties[index].group == "Blue":
                     self.property_group.append(8)
 
+        # Sort properties
         self.player.properties.sort(key=dict(zip(self.player.properties, self.property_group)).get)
 
         # Sprite for owning no houses
@@ -245,12 +266,17 @@ class PropertyView(arcade.View):
 
     def on_draw(self):
         self.clear()
+        arcade.draw_lrwh_rectangle_textured(0, 0,
+                                            self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
+                                            self.background)
 
         # set where a card is initially rendered in the property view
         self.card_x = self.SCREEN_WIDTH / 2
         self.card_y = self.SCREEN_HEIGHT / 2
 
+        # if no owned properties
         if len(self.player.properties) == 0:
+            # display that
             self.no_owned_houses.draw()
         else:
             # Draw first property the player holds
@@ -258,6 +284,7 @@ class PropertyView(arcade.View):
             self.monopoly_info.draw()
             self.manager.draw()
 
+        # display escape info
         self.escape_info.draw()
 
     def on_key_press(self, symbol: int, modifiers: int):
@@ -267,6 +294,8 @@ class PropertyView(arcade.View):
             self.window.show_view(self.game_view)
 
     def update_buttons(self):
+
+        # remove unnecessary buttons from manager
         if self.buy_house is not None:
             self.manager.remove(self.buy_house)
             self.buy_house = None
@@ -277,9 +306,11 @@ class PropertyView(arcade.View):
             self.manager.remove(self.sell_house)
             self.sell_house = None
 
-        # draw buy house button
+        # check if player owns a property
         if len(self.player.properties) > 0:
+            # check if that property is a street
             if self.player.properties[self.active_property].group in self.color_names:
+                # check if the player has a monopoly and can buy a house
                 if self.game_view.game.can_buy_house(self.player.properties[self.active_property], self.player):
                     # Button for buying a house
                     self.buy_house = arcade.gui.UIFlatButton(text="Buy house", width=self.button_width,
@@ -332,15 +363,17 @@ class PropertyView(arcade.View):
         self.right_arrow.on_click = self.scroll_right
 
     def mortgage_property(self, event):
+        #moretgage a property
         self.game_view.game.mortgage(self.player.properties[self.active_property], self.player)
         self.update_buttons()
 
     def unmortgage_property(self, event):
+        # unmortgage a property
         self.game_view.game.unmortgage(self.player.properties[self.active_property], self.player)
         self.update_buttons()
 
     def buy_building(self, event):
-
+        # make the purchase of a building
         self.game_view.game.buy_house(self.player.properties[self.active_property], self.player)
         self.update_buttons()
     
@@ -350,6 +383,7 @@ class PropertyView(arcade.View):
 
     def on_update(self, delta_time: float):
 
+        # if no owned properties
         if len(self.player.properties) == 0:
             pass
         else:
@@ -391,7 +425,7 @@ class GameView(arcade.View):
 
     def __init__(self, w, h, e, p):
         super().__init__()
-        arcade.set_background_color(arcade.color.AMAZON)
+        self.background = arcade.load_texture("./assets/table.png")
         self.SCREEN_WIDTH = w
         self.SCREEN_HEIGHT = h
         self.EDGE_SPACE = e
@@ -439,7 +473,9 @@ class GameView(arcade.View):
         # This command should happen before we start drawing. It will clear
         # the screen to the background color, and erase what we drew last frame.
         self.clear()
-
+        arcade.draw_lrwh_rectangle_textured(0, 0,
+                                            self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
+                                            self.background)
         # Call draw() on all your sprite lists below
         self.board.draw()
         self.game.die_sprites.draw()
@@ -731,13 +767,33 @@ class GameOverView(arcade.View):
 
     def __init__(self, w, h, e):
         super().__init__()
-
-        arcade.set_background_color(arcade.color.AMAZON)
+        self.background = arcade.load_texture("./assets/table.png")
         self.SCREEN_HEIGHT = h
         self.SCREEN_WIDTH = w
         self.EDGE_SPACE = e
         global time_taken
         time_taken = end_time - start_time
+        self.game_over = arcade.create_text_sprite("Game Over!", 
+                                                   self.SCREEN_WIDTH/2 - 200, 
+                                                   400, 
+                                                   arcade.color.WHITE, 
+                                                   54,
+                                                   font_name="assets/KabelMediumRegular.ttf")
+        self.thanks = arcade.create_text_sprite("Thanks for playing!", 
+                                                self.SCREEN_WIDTH/2 - 140, 
+                                                300, 
+                                                arcade.color.WHITE, 
+                                                24,
+                                                font_name="assets/KabelMediumRegular.ttf")
+
+        time_taken_formatted = f"{round(time_taken, 2)} seconds"
+        self.timetext = arcade.create_text_sprite(f"Game time: {time_taken_formatted}",
+                                              self.SCREEN_WIDTH / 2,
+                                              200,
+                                              arcade.color.WHITE,
+                                              font_size=15,
+                                              font_name="assets/KabelMediumRegular.ttf",
+                                              anchor_x="center")
 
     def setup(self):
         pass
@@ -746,16 +802,9 @@ class GameOverView(arcade.View):
 
     def on_draw(self):
         self.clear()
-        
-        arcade.draw_text("Game Over!", self.SCREEN_WIDTH/2 - 200, 400, arcade.color.WHITE, 54)
-        arcade.draw_text("Thanks for playing!", self.SCREEN_WIDTH/2 - 140, 300, arcade.color.WHITE, 24)
-
-        time_taken_formatted = f"{round(time_taken, 2)} seconds"
-        arcade.draw_text(f"Game time: {time_taken_formatted}",
-                         self.SCREEN_WIDTH / 2,
-                         200,
-                         arcade.color.WHITE,
-                         font_size=15,
-                         anchor_x="center")
-
-
+        arcade.draw_lrwh_rectangle_textured(0, 0,
+                                            self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
+                                            self.background)
+        self.game_over.draw()
+        self.thanks.draw()
+        self.timetext.draw()
