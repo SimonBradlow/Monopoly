@@ -162,9 +162,10 @@ class PropertyView(arcade.View):
         self.color_names = ['Brown', 'LightBlue', 'Pink', 'Orange', 'Red', 'Yellow', 'Green', 'Blue']
 
         # Create UI manager
+        self.buy_house = None
+        self.mortgage_button = None
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
-        self.update_buttons()
 
         # new list for sorting properties
         self.property_group = []
@@ -265,7 +266,10 @@ class PropertyView(arcade.View):
             self.window.show_view(self.game_view)
 
     def update_buttons(self):
-        self.manager.clear()
+        if self.buy_house is not None:
+            self.manager.remove(self.buy_house)
+        if self.mortgage_button is not None:
+            self.manager.remove(self.mortgage_button)
 
         # draw buy house button
         if len(self.player.properties) > 0:
@@ -325,6 +329,7 @@ class PropertyView(arcade.View):
     def buy_building(self, event):
 
         self.game_view.game.buy_house(self.player.properties[self.active_property], self.player)
+        self.update_buttons()
 
     def on_update(self, delta_time: float):
 
