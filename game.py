@@ -298,10 +298,14 @@ class Game():
         card_jail handles a player using their get out of jail free card
         returns False if the player did not have a card, True otherwise
         """
-        if not self.active_player.jail_free:
+        if self.active_player.jail_free == []:
             return False
         self.active_player.jailtime = 0
-        self.active_player.jail_free = None
+        if self.active_player.jail_free[0].card_type == "Chance":
+            self.chance.cards.append(self.active_player.jail_free[0])
+        elif self.active_player.jail_free[0].card_type == "Community Chest":
+            self.chest.cards.append(self.active_player.jail_free[0])
+        del self.active_player.jail_free[0]
         return True
     
     def send_to_jail(self, player:Player):
@@ -385,7 +389,7 @@ class Game():
         elif effect[0] == "move" or effect[0] == "move_utility" or effect[0] == "move_rr" or effect[0] == "move_abs":
             self.active_player.position = effect[1]
         else:
-            self.active_player.jail_free = True
+            self.active_player.jail_free.append(card)
         
         self.card_to_draw = False
 
@@ -402,7 +406,7 @@ class Game():
             if self.rolled == 0:
                 # If they haven't rolled yet, they can either roll or pay the fine
                 required_actions += ["roll_jail", "pay_fine"]
-                if self.active_player.jail_free:
+                if self.active_player.jail_free != []:
                     other_actions += ["card_jail"]
             else:
                 required_actions += ["end_turn", "rolled_jail"]

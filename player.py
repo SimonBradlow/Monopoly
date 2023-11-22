@@ -9,7 +9,7 @@ class Player():
     """
     class representing individual player in monopoly
     """
-    def __init__(self, pNumber, piece, scale, position: int =0, properties: list =[], money: int =1500, jailtime: int = 0, jail_free = False):
+    def __init__(self, pNumber, piece, scale, position: int =0, properties: list =[], money: int =1500, jailtime: int = 0, jail_free = []):
         self.player_no = pNumber
         self.position = position
         self.properties = properties
