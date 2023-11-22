@@ -184,7 +184,7 @@ class Property():
 
             # Draw price and rent for non-street sprites
             price_string = "PRICE $" + str(self.price) + "\n"
-            rent_string = "RENT $" + str(self.rents) + "\n"
+            rent_string = "RENT $" + str(self.rents[0]) + "\n"
             rent_string = rent_string.replace("[", "")
             rent_string = rent_string.replace("]", "")
             group_string = price_string

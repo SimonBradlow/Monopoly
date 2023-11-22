@@ -475,6 +475,7 @@ class GameView(arcade.View):
             self.game.active_player.take_turn(self.game)
             self.chat.clear()
             self.chat.append(self.board.players[1].log)
+            self.update_buttons()
 
     def on_key_press(self, key, key_modifiers):
         """

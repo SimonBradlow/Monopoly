@@ -7,6 +7,8 @@ from collections import defaultdict
 import random
 import arcade
 
+DEBUG = True
+
 class Game():
     """
     class enclosing the engine of the monopoly game
@@ -63,6 +65,10 @@ class Game():
         roll takes a list of integers representing the number of sides on the dice to roll,
         then returns a list of results for those dice being rolled
         """
+        # Debugging console entry for dice values
+        if DEBUG:
+            s = input("Enter the dice rolls as i, i: ")
+            return [int(v) for v in s.split(",")]
         roll = []
         for i in dice:
             roll.append(random.randint(1, i))
@@ -405,8 +411,10 @@ class Game():
             else:
                 if self.owners[self.active_property()] == self.active_player:
                     stubs += ["own_property"]
-                elif self.rolled > 0:
+                elif self.rolled > 0 and self.owners[self.active_property()] is None:
                     other_actions += ["buy_property"]
+                elif self.rolled > 0:
+                    stubs += ["pay_rent"]
             if len(required_actions) > 0:
                 stubs += [roll_end]
             else:
