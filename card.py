@@ -23,6 +23,7 @@ class Card():
         background.center_x = scale/2
         background.center_y = scale/2
 
+        # Text for the card
         fixed_desc = desc.replace('.', '\n')
         text = card_type +'\n\n'+ name +'\n'+ fixed_desc
         text_sprite = arcade.create_text_sprite(

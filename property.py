@@ -24,13 +24,16 @@ class Property():
         self.width = 0
         self.height = 0
         self.color_names = ['Brown', 'LightBlue', 'Pink', 'Orange', 'Red', 'Yellow', 'Green', 'Blue']
+
         if self.group in self.color_names:      
+            # Street properties
             self.width = iscale
             self.height = self.width*1.125
             self.edge = self.width*0.075
             self.rgb_values = [(134, 76, 56), (172, 220, 242), (197, 56, 132), (236, 139, 44), (219, 36, 40), (255, 239, 3), (19, 168, 87), (0, 102, 164)]
             self.color_dict = {self.color_names[i]: self.rgb_values[i] for i in range(len(self.color_names))}
 
+            # shapes for the card without the text
             background = arcade.create_rectangle_filled(0, 0, self.width, self.height, arcade.color.WHITE) 
             border = arcade.create_rectangle_outline(0, 0, self.width-self.edge, self.height-self.edge, arcade.color.BLACK, 1) 
             inner = arcade.create_rectangle_filled(0, ((self.height-self.edge*2)/10)*4, self.width-self.edge*2, (self.height-self.edge*2)/5, self.color_dict[self.group])
