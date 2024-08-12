@@ -1,7 +1,4 @@
 # Monopoly
+This is a single-player (1v1 against the computer) implementation of the classic boardgame Monopoly using the Python Arcade library.
 
-## Description
-Results of sprint 3. Python Arcade required.
-The file to run is window.py.
-You may need to change window size to see better resolution.
-These changes can be made in window.py.
+This project was a group project from my class on software engineering, but all code that wasn't sourced directly from the Python Arcade documentation was written from scratch.
